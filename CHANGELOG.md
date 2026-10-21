@@ -2,6 +2,13 @@
 
 ## 0.2.4
 
+- **The location rules work.** `location-excluded` and
+  `location-preferred-elsewhere` read a shape no real response has: Upwork
+  returns `preferred_locations` as `{countries, location_required}` beside
+  `preferred_qualifications`, not inside it. Both rules were silently false
+  on every post. A post that names places other than countries, or a profile
+  without `country`, now reports the rules as unknown. New fixture
+  `job-location.json`, trimmed from a real Poland-only post.
 - A profile saved with a UTF-8 byte-order mark now loads.
 - The settings the rules read must be numbers: `rates.floor_hourly`,
   `availability.hours_per_week`, `connects.min_balance` and the

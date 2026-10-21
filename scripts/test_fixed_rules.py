@@ -139,6 +139,16 @@ class Verdicts(unittest.TestCase):
         out = fixed_rules.screen(RULES, coach_facts(client_hire_rate=23, client_hires=40), ANSWERS)
         self.assertIn("low-hire-rate", ids(out["fired"]))
 
+    def test_location_rules(self):
+        job = load("job-location.json")
+        out = fixed_rules.screen(RULES, facts.build(job=job, settings=SETTINGS, now=NOW))
+        self.assertIn("location-preferred-elsewhere", ids(out["fired"]))
+        self.assertNotIn("location-excluded", ids(out["fired"]))
+        job["preferred_locations"]["location_required"] = True
+        out = fixed_rules.screen(RULES, facts.build(job=job, settings=SETTINGS, now=NOW))
+        self.assertIn("location-excluded", ids(out["fired"]))
+        self.assertEqual(out["verdict"], "SKIP")
+
     def test_notes_do_not_change_the_verdict(self):
         answers = dict(ANSWERS)
         answers["unrelated-client-history"] = {"answer": False, "why": "Software work."}

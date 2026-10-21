@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0
+
+- **`routine`** keeps a scheduled Claude Code routine screening Upwork with the
+  same rules as your sessions. Routines can't install plugins, so the prompt
+  it renders (`scripts/render_routine.py`, `templates/routine-prompt.md`)
+  clones this repo at the installed release and follows `screen`, with your
+  profile and, if you have one, your private draft skill inside it. Each run
+  screens the posts published since the previous scheduled run.
+- The routine's connector tools are cut down to what a scan needs
+  (`rules/routine-tools.yaml`, `scripts/routine_tools.py`), so a run can't
+  submit, boost or message.
+- New profile setting: `routine.trigger_id`.
+
 ## 0.1.0
 
 First release.

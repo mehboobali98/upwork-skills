@@ -93,8 +93,7 @@ Connects balance after.
 Then update the job's bid log row: `rate`, `proposal_id`, `submitted_at`
 (now, ISO 8601 with its offset) and `boost` (0 for none). For a Sheet, find
 the job in `<tab>!B:B` and update `<tab>!X<n>:AA<n>` (the `submit` range from
-`bidlog.py row`), plus `<tab>!AD<n>` for a SKIP override note, with
-`valueInputOption` set to `RAW` so the proposal ID stays text. For a CSV:
+`bidlog.py row`), plus `<tab>!AD<n>` for a SKIP override note. For a CSV:
 
 ```sh
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bidlog.py" update --csv <path> --job-id <job id> \

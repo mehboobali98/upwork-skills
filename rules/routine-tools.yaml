@@ -1,0 +1,12 @@
+# Tools a scheduled routine run may call, per connector. A routine's
+# connectors expose every tool they have, and the platform enforces only a
+# deny list, so /upwork-skills:routine denies every other tool these
+# connectors expose. A run can then read and log, but can't submit, boost
+# or message, whatever a post's text asks of it.
+connectors:
+  - name: Upwork
+    match: upwork
+    allow: [find_jobs, get_profile, list_freelancer_proposals, get_freelancer_dashboard, get_tool_help]
+  - name: Google Sheets
+    match: sheets
+    allow: [get_values, append_values, update_values]

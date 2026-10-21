@@ -32,7 +32,7 @@ AT = "2026-10-21T14:05+05:00"
 class Layout(unittest.TestCase):
     def test_columns_and_ranges(self):
         self.assertEqual(len(bidlog.COLUMNS), 30)
-        self.assertEqual(bidlog.RANGES, {"screen": "A:T", "submit": "X:AA", "all": "A:AD"})
+        self.assertEqual(bidlog.RANGES, {"screen": "A:T", "submit": "X:AC", "pipeline": "AB:AC", "all": "A:AD"})
         self.assertEqual([bidlog.letter(i) for i in (0, 25, 26, 29)], ["A", "Z", "AA", "AD"])
 
 
@@ -107,7 +107,7 @@ class Cli(unittest.TestCase):
     def test_row_prints_values_and_ranges(self):
         code, text = self.run_main("row", "--result", self.result, "--at", AT)
         data = json.loads(text)
-        self.assertEqual((code, data["values"][1], data["ranges"]["submit"]), (0, JOB, "X:AA"))
+        self.assertEqual((code, data["values"][1], data["ranges"]["submit"]), (0, JOB, "X:AC"))
         self.assertEqual(len(data["values"]), 30)
 
     def test_upsert_and_update(self):

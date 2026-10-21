@@ -91,13 +91,18 @@ the stored rate (`terms.chargeRate`), the boost (`terms.connectsBid`) and the
 Connects balance after.
 
 Then update the job's bid log row: `rate`, `proposal_id`, `submitted_at`
-(now, ISO 8601 with its offset) and `boost` (0 for none). For a Sheet, find
-the job in `<tab>!B:B` and update `<tab>!X<n>:AA<n>` (the `submit` range from
-`bidlog.py row`), plus `<tab>!AD<n>` for a SKIP override note. For a CSV:
+(now, ISO 8601 with its offset), `boost` (0 for none), `outcome` (`sent`)
+and `outcome_at` (the same time as `submitted_at`). For a Sheet, find the
+job in `<tab>!B:B` and update `<tab>!X<n>:AC<n>` (the `submit` range from
+`bidlog.py row`) with those six values in that order, plus `<tab>!AD<n>`
+for a SKIP override note. For a CSV:
 
 ```sh
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bidlog.py" update --csv <path> --job-id <job id> \
-  --set rate=<rate> --set proposal_id=<proposal id> --set submitted_at=<time> --set boost=<n>
+  --set rate=<rate> --set proposal_id=<proposal id> --set submitted_at=<time> --set boost=<n> \
+  --set outcome=sent --set outcome_at=<time>
 ```
+
+From then on `pipeline` keeps `outcome` up to date.
 
 If the log can't be updated, say so and print the values.

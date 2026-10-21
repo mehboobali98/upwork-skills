@@ -43,6 +43,8 @@ rule_overrides:
     effect: NOTE
 drafts_dir: ~/upwork/drafts
 evidence_file: ~/upwork/evidence.md
+routine:
+  trigger_id: trig_0000000000000000000000
 ---
 
 # Upwork profile

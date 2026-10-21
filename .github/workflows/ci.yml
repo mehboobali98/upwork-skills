@@ -25,6 +25,8 @@ jobs:
           done
       - name: Default rules and the example profile load
         run: python scripts/profile_loader.py --profile templates/profile.example.md --check
+      - name: The routine prompt renders from the example profile
+        run: python scripts/render_routine.py --cron "0 9,14,18,22 * * *" --profile templates/profile.example.md > /dev/null
       - name: Plugin manifests parse
         run: |
           for j in .claude-plugin/*.json; do

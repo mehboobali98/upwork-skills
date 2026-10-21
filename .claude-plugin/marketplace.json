@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "upwork-skills",
-      "description": "Screens Upwork posts against your own rules before you spend Connects, submits a proposal only after you approve the exact preview, and logs every bid with the signals it was judged on.",
+      "description": "Screens Upwork posts against your own rules before you spend Connects, submits a proposal only after you approve the exact preview, logs every bid with the signals it was judged on, and keeps a scheduled scan on the same rules.",
       "source": "./",
       "category": "productivity",
       "keywords": ["upwork", "freelancing", "proposals", "connects"],

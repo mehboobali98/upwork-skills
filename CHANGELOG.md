@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+- The routine's prompt now tells the run to do all the work in its own
+  session. A rehearsal with an eleven-hour window handed the row compiling to
+  a subagent, ended its turn to wait, and never wrote a report. Run
+  `/upwork-skills:routine` again after updating.
+
 ## 0.2.1
 
 - The routine's window lines now give each scheduled slot's range and the

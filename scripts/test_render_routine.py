@@ -129,6 +129,10 @@ class Render(unittest.TestCase):
         prompt = rr.render("{{profile}}", "note: {{tag}}\n", REL, "0 9 * * *", ALLOWED)
         self.assertIn("note: {{tag}}", prompt)
 
+    def test_run_stays_in_one_session(self):
+        self.assertIn("Don't start subagents, forks or background tasks", self.prompt)
+        self.assertIn("don't end your turn until the report is written", self.prompt)
+
     def test_setup_resolves_the_home_directory(self):
         self.assertIn("echo $HOME", self.prompt)
         self.assertIn("$HOME/.config/upwork-skills/profile.md", self.prompt)

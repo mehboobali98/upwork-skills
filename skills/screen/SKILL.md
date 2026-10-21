@@ -39,9 +39,9 @@ has one, else `mktemp -d`).
    and stop.
 2. Save the response as `job.json`, keeping only the keys the rules read:
    `applied`, `connects_cost`, `connects_balance`, `client_record`,
-   `client_work_history`, `preferred_qualifications` and `data`, with
-   `data.marketplaceJobPosting.content.description` set to `""`. Copy every
-   value exactly.
+   `client_work_history`, `preferred_qualifications`, `preferred_locations`
+   and `data`, with `data.marketplaceJobPosting.content.description` set to
+   `""`. Copy every value exactly.
 3. Find the post's search row, which carries `published_date` and the
    proposal count: `find_jobs action=search` with `title` set to two or three
    distinctive words from the post's title, `sort=recency`, `limit=10`. Save

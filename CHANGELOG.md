@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1
+
+- The routine's window lines now give each scheduled slot's range and the
+  time to screen from, for example "fired between 09:00 and 14:00: screen
+  posts since 22:00 the day before". The old "09:00: posts since 22:00" named
+  two times, and a run that started at 10:33 screened from 09:00 instead of
+  22:00. Run `/upwork-skills:routine` again after updating.
+
 ## 0.2.0
 
 - **`routine`** keeps a scheduled Claude Code routine screening Upwork with the

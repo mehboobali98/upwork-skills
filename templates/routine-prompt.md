@@ -32,7 +32,7 @@ If the clone or the check fails, report the error and stop. Never screen from me
 
 ## 2. Window
 
-Times are UTC. Find when this run fired: the "This task fired at" line added to this prompt, or `date -u` if there isn't one. Take the latest time below at or before it, and screen the posts published since the time it names. If none fits, screen the last 24 hours.
+Times are UTC. Find when this run fired: the "This task fired at" line added to this prompt, or `date -u` if there isn't one. Find the line below whose range holds that time, and screen the posts published since the time after "since" on that line. If none fits, screen the last 24 hours.
 
 {{windows}}
 

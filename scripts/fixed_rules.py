@@ -45,6 +45,8 @@ def screen(rules, f, answers=None):
         else:
             out["fired"].append(entry)
     out["verdict"] = _verdict(out)
+    if out["verdict"] == "SKIP":
+        out["pending"] = []
     return out
 
 
@@ -158,8 +160,8 @@ def render(out):
         f"  {_val(f['proposals_label'])} proposals, {_val(f['age_hours'])} h old, "
         f"{_val(f['connects_cost'])} Connects of {_val(f['connects_balance'])}, {_val(f['balance_after'])} after",
     ]
-    lines += [f"  {e['effect']} {e['id']}: {e['detail']}. {e['reason']}" for e in out["fired"]]
-    lines += [f"  override {e['id']}: {e['why']}. {e['override_reason']}".rstrip() for e in out["overridden"]]
+    lines += [f"  {e['effect']} {e['id']}: {e['detail'].rstrip('.')}. {e['reason']}" for e in out["fired"]]
+    lines += [f"  override {e['id']}: {e['why'].rstrip('.')}. {e['override_reason']}".rstrip() for e in out["overridden"]]
     lines += [f"  NOTE {e['id']}: {e['reason']}" for e in out["notes"]]
     lines += [f"  unknown {e['id']}: {e['detail']}" for e in out["unknown"]]
     lines += [f"  ask {q['id']} ({q['answer']}): {q['ask']}" for q in out["pending"]]

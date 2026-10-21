@@ -107,6 +107,13 @@ class Verdicts(unittest.TestCase):
         self.assertEqual([e["id"] for e in out["fired"] if e["effect"] == "SKIP"],
                          ["client-never-hired", "client-never-reviews"])
         self.assertEqual(ids(out["unknown"]), ["harsh-rater", "dead-post", "crowded"])
+        self.assertEqual(out["pending"], [])
+
+    def test_report_keeps_one_full_stop_after_a_reason(self):
+        answers = dict(ANSWERS)
+        answers["outside-experience"] = {"answer": True, "why": "Needs vector infrastructure."}
+        out = fixed_rules.result(RULES, coach_facts(), answers)
+        self.assertIn("SKIP outside-experience: Needs vector infrastructure. A proposal", fixed_rules.render(out))
 
     def test_full_time_rule_follows_the_profile(self):
         f = facts.build(job=load("job-full-time.json"), settings=SETTINGS, now=NOW)

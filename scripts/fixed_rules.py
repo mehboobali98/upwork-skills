@@ -2,12 +2,18 @@
 
     fixed_rules.py --job job.json [--row row.json] [--answers answers.json] [--json]
     fixed_rules.py --rows rows.json [--json]
+    fixed_rules.py --jobs DIR [--rows rows.json] [--answers answers.json] [--out DIR] [--json]
 
 --job is a find_jobs action=get response and --row the post's search row,
 which carries its posting time and proposal count. Fixed rules are code, so
 the same post always gets the same verdict; judgement rules come back as
 questions until --answers supplies them. --rows is a scan's first pass: the
 fixed rules a search row can answer, SKIP or READ per post.
+
+--jobs screens every <job id>.json in DIR at once, finding each post's row
+in --rows by ID. The questions still open come back as one answers template
+keyed by job ID; fill it in and pass it as --answers. --out writes each
+post's result as DIR/<job id>.json, the file bidlog.py reads.
 """
 import argparse
 import json
@@ -22,6 +28,9 @@ import profile_loader  # noqa: E402
 
 class ScreenError(ValueError):
     pass
+
+
+VERDICT_ORDER = {"BID": 0, "MAYBE": 1, "PENDING": 2, "SKIP": 3}
 
 
 def screen(rules, f, answers=None):
@@ -73,6 +82,45 @@ def first_pass(rules, rows, settings, now=None):
             "skipped_by": [e["id"] for e in verdict["fired"] if e["effect"] == "SKIP"],
         })
     return out
+
+
+def batch(rules, jobs, rows, settings, answers=None, now=None):
+    """Every post's result, BIDs first, and a template of the questions still open, keyed by job ID."""
+    answers = answers or {}
+    if not isinstance(answers, dict) or not all(isinstance(v, dict) for v in answers.values()):
+        raise ScreenError("batch answers map each job ID to that post's {question: {answer, why}}")
+    extra = sorted(set(answers) - set(jobs))
+    if extra:
+        raise ScreenError(f"answers for jobs not in --jobs: {', '.join(extra)}")
+    by_id = {str(row["id"]): row for row in rows if isinstance(row, dict) and row.get("id")}
+    out, template = [], {}
+    for job_id, job in jobs.items():
+        given = {k: v for k, v in answers.get(job_id, {}).items()
+                 if not (isinstance(v, dict) and v.get("answer") is None)}
+        res = result(rules, facts.build(job=job, row=by_id.get(job_id), settings=settings, now=now), given)
+        out.append(res)
+        if res["pending"]:
+            template[job_id] = {q["id"]: {"answer": None, "why": "", "ask": q["ask"], "type": q["answer"]}
+                                for q in res["pending"]}
+    out.sort(key=lambda r: VERDICT_ORDER[r["verdict"]])
+    return out, template
+
+
+def load_jobs(path):
+    jobs = {}
+    for name in sorted(os.listdir(path)):
+        if not name.endswith(".json"):
+            continue
+        job_id, job = name[:-5], _read(os.path.join(path, name))
+        if not isinstance(job, dict):
+            raise ScreenError(f"{name} isn't a find_jobs action=get response")
+        posting = ((job.get("data") or {}).get("marketplaceJobPosting") or {}).get("id")
+        if posting and str(posting) != job_id:
+            raise ScreenError(f"{name} holds job {posting}; name it {posting}.json")
+        jobs[job_id] = job
+    if not jobs:
+        raise ScreenError(f"no <job id>.json files in {path}")
+    return jobs
 
 
 def _check_answers(rules, answers):
@@ -180,6 +228,14 @@ def render_rows(rows):
     return "\n".join(lines)
 
 
+def render_batch(out, template):
+    blocks = [render(r) for r in out]
+    if template:
+        blocks.append("Still open: fill in each answer below, save it as answers.json, and run again "
+                      "with --answers answers.json.\n" + json.dumps(template, indent=2))
+    return "\n\n".join(blocks)
+
+
 def _val(value):
     return "?" if value is None else str(value)
 
@@ -193,7 +249,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Screen an Upwork post against the profile's rules.")
     ap.add_argument("--job", help="find_jobs action=get response, as JSON")
     ap.add_argument("--row", help="the post's search row, as JSON")
-    ap.add_argument("--rows", help="a list of search rows, for a scan's first pass")
+    ap.add_argument("--rows", help="a list of search rows, for a scan's first pass or to find --jobs rows")
+    ap.add_argument("--jobs", help="a directory of <job id>.json get responses, screened together")
+    ap.add_argument("--out", help="with --jobs, write each post's result to this directory")
     ap.add_argument("--answers", help="answers to the judgement questions, as JSON")
     ap.add_argument("--lane", help="screen in this lane instead of the matched one")
     ap.add_argument("--profile")
@@ -201,16 +259,35 @@ def main(argv=None):
     ap.add_argument("--now", help="ISO time to measure post age from (default: now)")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
-    if bool(args.job) == bool(args.rows):
-        ap.error("pass --job or --rows")
-    if args.rows and (args.row or args.answers or args.lane):
+    if args.jobs:
+        if args.job or args.row or args.lane:
+            ap.error("--jobs finds each post's row in --rows; --job, --row and --lane screen one post")
+    elif bool(args.job) == bool(args.rows):
+        ap.error("pass --job, --rows or --jobs")
+    elif args.rows and (args.row or args.answers or args.lane):
         ap.error("--row, --answers and --lane go with --job; a first pass runs only the fixed rules")
+    if args.out and not args.jobs:
+        ap.error("--out goes with --jobs")
     try:
         now = facts.parse_time(args.now) if args.now else None
         if args.now and now is None:
             raise ScreenError(f"--now {args.now!r} isn't an ISO time")
         profile = profile_loader.load_profile(args.profile)
         rules = profile_loader.load_rules(profile["settings"], args.rules)
+        if args.jobs:
+            rows = _read(args.rows) if args.rows else []
+            if not isinstance(rows, list):
+                raise ScreenError("--rows must be a JSON list of search rows")
+            out, template = batch(rules, load_jobs(args.jobs), rows, profile["settings"],
+                                  _read(args.answers) if args.answers else None, now)
+            if args.out:
+                os.makedirs(args.out, exist_ok=True)
+                for res in out:
+                    with open(os.path.join(args.out, f"{res['job_id']}.json"), "w", encoding="utf-8") as fh:
+                        json.dump(res, fh, indent=2)
+            print(json.dumps({"posts": out, "answers_template": template}, indent=2) if args.json
+                  else render_batch(out, template))
+            return 0
         if args.rows:
             out = first_pass(rules, _read(args.rows), profile["settings"], now)
             print(json.dumps(out, indent=2) if args.json else render_rows(out))

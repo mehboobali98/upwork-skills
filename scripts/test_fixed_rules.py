@@ -188,6 +188,52 @@ class FirstPass(unittest.TestCase):
         self.assertEqual([r["job_id"] for r in out], [None, None, "2112473844631677510", "2112631294964854278"])
 
 
+POLAND = "2100921331325707992"
+REVIEW = "2112631294964854278"
+
+
+def batch_jobs():
+    return {COACH: load("job-coach.json"), REVIEW: load("job-no-history.json"), POLAND: load("job-location.json")}
+
+
+def batch_rows():
+    return [coach_row(12)] + [r for r in load("rows.json") if r["id"] != COACH]
+
+
+class Batch(unittest.TestCase):
+    def test_open_questions_come_back_as_a_template(self):
+        out, template = fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, now=NOW)
+        self.assertEqual([(r["job_id"], r["verdict"]) for r in out], [(COACH, "PENDING"), (REVIEW, "SKIP"), (POLAND, "SKIP")])
+        self.assertEqual(list(template), [COACH])
+        self.assertIn("coaching-ask", template[COACH])
+        self.assertEqual(template[COACH]["coaching-ask"]["answer"], None)
+        self.assertTrue(template[COACH]["coaching-ask"]["ask"])
+
+    def test_answers_by_job_settle_the_verdict(self):
+        out, template = fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, {COACH: ANSWERS}, NOW)
+        self.assertEqual([(r["job_id"], r["verdict"]) for r in out], [(COACH, "MAYBE"), (REVIEW, "SKIP"), (POLAND, "SKIP")])
+        self.assertEqual(template, {})
+
+    def test_a_blank_answer_keeps_its_post_open(self):
+        _, template = fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, now=NOW)
+        filled = {k: {"answer": v["answer"], "why": v["why"]} for k, v in ANSWERS.items()}
+        filled["unpaid-sample"] = template[COACH]["unpaid-sample"]
+        out, template = fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, {COACH: filled}, NOW)
+        self.assertEqual(out[0]["verdict"], "PENDING")
+        self.assertEqual(list(template[COACH]), ["unpaid-sample"])
+
+    def test_rows_are_found_by_job_id(self):
+        out, _ = fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, now=NOW)
+        by_id = {r["job_id"]: r["facts"] for r in out}
+        self.assertEqual(by_id[COACH]["proposals"], 12)
+        self.assertIsNone(by_id[POLAND]["proposals"])
+
+    def test_bad_batches(self):
+        for answers in ({"999": {}}, {COACH: {"no-such-question": {"answer": True}}}, {COACH: "yes"}):
+            with self.assertRaises(fixed_rules.ScreenError, msg=answers):
+                fixed_rules.batch(RULES, batch_jobs(), batch_rows(), SETTINGS, answers, NOW)
+
+
 class Cli(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp()
@@ -236,6 +282,45 @@ class Cli(unittest.TestCase):
             with self.assertRaises(SystemExit, msg=extra) as caught:
                 self.run_main("--rows", rows, *extra)
             self.assertEqual(caught.exception.code, 2)
+
+    def jobs_dir(self, jobs):
+        path = os.path.join(self.dir, "jobs")
+        os.makedirs(path, exist_ok=True)
+        for job_id, job in jobs.items():
+            self.path(os.path.join("jobs", f"{job_id}.json"), job)
+        return path
+
+    def test_jobs_as_text(self):
+        code, text = self.run_main("--jobs", self.jobs_dir(batch_jobs()), "--rows", self.path("rows.json", batch_rows()))
+        self.assertEqual(code, 0)
+        self.assertTrue(text.startswith("PENDING  Claude Code coach"))
+        self.assertIn("SKIP  Senior Ruby on Rails Engineer", text)
+        self.assertIn("answers.json", text)
+        self.assertIn('"coaching-ask"', text)
+
+    def test_jobs_as_json_with_out(self):
+        out = os.path.join(self.dir, "results")
+        code, text = self.run_main("--jobs", self.jobs_dir(batch_jobs()), "--rows", self.path("rows.json", batch_rows()),
+                                   "--answers", self.path("answers.json", {COACH: ANSWERS}), "--out", out, "--json")
+        doc = json.loads(text)
+        self.assertEqual((code, doc["posts"][0]["verdict"], doc["answers_template"]), (0, "MAYBE", {}))
+        self.assertEqual(sorted(os.listdir(out)), sorted(f"{i}.json" for i in batch_jobs()))
+        with open(os.path.join(out, f"{COACH}.json"), encoding="utf-8") as fh:
+            self.assertEqual(json.load(fh)["verdict"], "MAYBE")
+
+    def test_a_job_file_named_for_another_post(self):
+        path = self.jobs_dir({POLAND: load("job-coach.json")})
+        self.assertEqual(self.run_main("--jobs", path)[0], 2)
+
+    def test_jobs_take_no_single_post_options(self):
+        jobs = self.jobs_dir(batch_jobs())
+        for extra in (["--job", self.path("job.json", load("job-coach.json"))], ["--lane", "rails"],
+                      ["--row", self.path("row.json", coach_row())]):
+            with self.assertRaises(SystemExit, msg=extra) as caught:
+                self.run_main("--jobs", jobs, *extra)
+            self.assertEqual(caught.exception.code, 2)
+        with self.assertRaises(SystemExit):
+            self.run_main("--job", self.path("job.json", load("job-coach.json")), "--out", self.dir)
 
     def test_errors_exit_2(self):
         self.assertEqual(self.run_main("--job", "/nonexistent.json")[0], 2)

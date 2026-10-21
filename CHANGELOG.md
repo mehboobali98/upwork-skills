@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.6
+
+- A scan screens its READ posts in one batch: `fixed_rules.py --jobs DIR
+  --rows rows.json --out results` reads every saved `<job id>.json`, finds
+  each post's row by ID, and ends with one answers template, keyed by job
+  ID, for the questions still open. Filled in and passed back with
+  `--answers`, it gives the final verdicts, BIDs first, and `--out` writes
+  each post's result for the bid log. Live runs with 12 or more READ posts
+  skipped the four steps per post that 0.2.3 spelled out and judged by eye;
+  runs with 6 or 7 followed them. The batch is two commands for any number
+  of posts. Run `/upwork-skills:routine` again after updating.
+
 ## 0.2.5
 
 - `screen` keeps `preferred_locations` when it saves a post as `job.json`.

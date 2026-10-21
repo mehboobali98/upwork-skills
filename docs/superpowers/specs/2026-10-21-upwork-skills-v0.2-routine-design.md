@@ -34,6 +34,9 @@ Agreed with the author on 21 October:
 | `templates/routine-prompt.md` | yes | The routine's prompt, with slots for the repo, tag, windows, profile and draft instructions |
 | `scripts/render_routine.py` | yes | Fills the slots. No network calls |
 | `scripts/test_render_routine.py` | yes | Unit tests (`unittest`, like the other suites) |
+| `rules/routine-tools.yaml` | yes | The tools a run may call, per connector |
+| `scripts/routine_tools.py` | yes | Turns a connector's tool list into the run's `disallowed_tools` |
+| `scripts/test_routine_tools.py` | yes | Unit tests |
 | `skills/routine/SKILL.md` | yes | `/upwork-skills:routine`: fetch the live routine, render, show the diff, update after a yes |
 | the profile's `routine` setting | no | `routine: {trigger_id: trig_…}` |
 
@@ -71,7 +74,7 @@ The run takes its fire time from the "This task fired at" line the platform appe
 
 In order:
 
-1. **Hard rule.** Read, screen, draft, report. Never submit, boost or message. The prompt says this whether or not the connectors are limited, so the rule doesn't depend on the lockdown check. If the user replies in the run session asking to submit, tell them to use `/upwork-skills:submit` in a local session.
+1. **Hard rule.** Read, screen, draft, report. Never submit, boost or message. If the user replies in the run session asking to submit, tell them to use `/upwork-skills:submit` in a local session. Then the allowed tools, one line per connector, and a tripwire: if the run can see any other Upwork or Google Sheets tool, it doesn't use it and names it at the top of the report. That catches a tool the connector added after the last render.
 2. **Setup.**
    - `git clone --depth 1 --branch <tag> <repo> /tmp/upwork-skills`. Wherever the skill says `${CLAUDE_PLUGIN_ROOT}`, use `/tmp/upwork-skills`.
    - Write the profile between the markers to `~/.config/upwork-skills/profile.md` with the Write tool, exactly.
@@ -90,19 +93,31 @@ In order:
 1. **Inputs.** Read the settings (`profile_loader.py --settings`) and `plugin.json`. Check the tag exists on the remote with `git ls-remote --tags <repo> refs/tags/<tag>`; if it doesn't, the installed version isn't released, so stop.
 2. **The routine.** With `routine.trigger_id`, fetch it (`RemoteTrigger action=get`). Without one, have the user create it with `/schedule`: their schedule, the Upwork connector, plus Google Sheets when the log is a Sheet, any prompt. Then put its ID in the profile and run the skill again. Creating is left to `/schedule` because it knows the user's environments and connector IDs and this skill doesn't.
 3. **Render** with the routine's cron and the draft skill at `~/.claude/skills/upwork-draft/SKILL.md` if it exists (another path can be named). Write the live and new prompts to files and show `diff -u`.
-4. **Connectors.** From the routine's `mcp_connections`, keep Upwork, and Google Sheets when the log is a Sheet, each with its `permitted_tools`:
+4. **Connectors and tools.** From the routine's `mcp_connections`, keep Upwork, and Google Sheets when the log is a Sheet. Propose dropping every other connector, since the deny list covers only these two; a routine created through the API without connectors named gets every connector the account has, Gmail included. If a needed connector is missing, stop and point at the routine's page on claude.ai to add it; the skill has no way to look up connector IDs.
+
+   The allowed tools, in `rules/routine-tools.yaml`:
    - Upwork: `find_jobs`, `get_profile`, `list_freelancer_proposals`, `get_freelancer_dashboard`, `get_tool_help`;
    - Google Sheets: `get_values`, `append_values`, `update_values`.
 
-   Propose dropping every other connector. If a needed connector is missing, stop and point at the routine's page on claude.ai to add it; the skill has no way to look up connector IDs.
+   For each kept connector, the skill writes down every tool this session can see from it, then `routine_tools.py --connection <name on the routine> <file>` prints the cloud names (`mcp__<name>__<tool>`) of the rest. Together they become `session_context.disallowed_tools`.
 5. **Confirm.** Show the prompt diff and the connector change together. Update only after an explicit yes. The update keeps the routine's environment, model, allowed tools and schedule, and replaces the prompt event with a new one (fresh UUID).
 6. **Verify.** Fetch the routine again and check that the prompt and connectors match what was approved. Offer one test run; it's read-only.
 
 Run it again after every plugin update or profile change. The routine runs the tag it was rendered with until then.
 
-## Lockdown check
+## Lockdown
 
-`permitted_tools` is undocumented, so its name format and whether it's enforced are unknown. Before anything relies on it, the throwaway routine gets one Upwork tool allowed and is asked to call a harmless read-only tool that isn't (`get_freelancer_financials`). If that call goes through, the lockdown is cut from 0.2.0 and the author is told, rather than shipping a guard that only exists on paper.
+Checked on 21 October with the throwaway routine, using harmless read-only tools:
+
+| Mechanism | Result |
+|---|---|
+| `permitted_tools: [upwork__find_jobs, upwork__get_tool_help]` on the Upwork connection | Not enforced. `get_freelancer_financials` still ran and every Upwork tool was visible. |
+| `session_context.disallowed_tools: [mcp__Upwork__upwork__get_freelancer_financials]` | Enforced. The tool vanished from the run; `find_jobs` and `get_tool_help` still worked. |
+| The same for `mcp__Google_Sheets__get_screenshot` | Enforced; `get_values` still worked. |
+
+So the lockdown is a deny list: every tool of the kept connectors except the allowed ones. Cloud tool names are `mcp__<connection name>__<server tool>`, for example `mcp__Upwork__upwork__manage_proposals` and `mcp__Google_Sheets__batch_clear_values`. A deny list only covers the tools it names, which is why the prompt carries the tripwire above and why the skill is rerun after plugin updates.
+
+Two API facts the skill relies on: an update that includes `job_config` replaces all of it, so the environment and session settings are carried over; and `run` starts a run even when the routine is disabled.
 
 ## Errors
 
@@ -122,11 +137,18 @@ Run it again after every plugin update or profile change. The routine runs the t
 - the profile embedded byte for byte between the markers;
 - draft front matter stripped, the preface present, and the no-draft sentence when no skill is given.
 
+`scripts/test_routine_tools.py`:
+
+- local tool names (`mcp__claude_ai_Upwork__upwork__find_jobs`) mapped to cloud names for the connection;
+- allowed tools left out of the deny list, duplicates and blank lines ignored;
+- an allowed tool missing from the connector's list reported;
+- a connection name with a space, or one no entry matches, rejected.
+
 End to end, on the author's routine:
 
-1. the lockdown check above;
-2. render, show him the diff, update after his yes;
-3. one manual run, then read its log for the clone, the profile check, the fixed rules, a Sheet row if anything is a BID or MAYBE, and a denied write tool if the run tries one.
+1. a rehearsal on the throwaway routine (disabled, given the live cron): sync it with the skill and run it once by hand;
+2. on the live routine: render, show him the diff, update after his yes, keeping the old prompt to roll back to;
+3. one manual run, then read its log for the clone, the profile check, the fixed rules, a Sheet row if anything is a BID or MAYBE, and the tripwire line.
 
 ## Release
 
@@ -134,7 +156,8 @@ Version `0.2.0`, a CHANGELOG entry, a README section for `routine`, the PR throu
 
 ## Risks
 
-- `permitted_tools` may not be enforced (see the lockdown check).
+- The deny list covers only the tools the connector had when the skill last ran. The tripwire reports a new one; rerunning the skill denies it.
+- The rendered prompt is about 20,000 characters, twice the current one. The API's limit on prompt size is unknown; the rehearsal finds out.
 - The platform's "This task fired at" line is observed behaviour, not documented. The run falls back to `date -u`.
 - The run copies the profile, about 11 KB, into a file by hand. `--check` catches a broken settings block, but not a typo in the body, which only drafting reads.
 - A routine runs the tag it was last rendered with. If the user upgrades the plugin and doesn't run `routine`, the cloud stays on the older release; the report names the tag so it shows.

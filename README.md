@@ -55,8 +55,11 @@ You need:
    bid log. Check it with:
 
    ```sh
-   python3 scripts/profile_loader.py --check
+   python3 ~/.claude/plugins/marketplaces/upwork-skills/scripts/profile_loader.py --check
    ```
+
+   That's the marketplace's copy of this repo. From a clone, run
+   `python3 scripts/profile_loader.py --check` instead.
 
 ## Your profile
 

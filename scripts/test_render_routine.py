@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Tests for render_routine.py. Run with: python3 test_render_routine.py"""
+import codecs
 import contextlib
 import io
 import json
@@ -68,9 +69,23 @@ class Windows(unittest.TestCase):
                          ["- fired between Sun 08:00 and the next Sun 08:00: screen posts since Sun 08:00 the week before"])
         self.assertEqual(rr.windows("0 8 * * 0,7"), rr.windows("0 8 * * 0"))
 
+    def test_every_hour_and_every_n_hours(self):
+        self.assertEqual(rr.windows("0 */6 * * *"), [
+            "- fired between 00:00 and 06:00: screen posts since 18:00 the day before",
+            "- fired between 06:00 and 12:00: screen posts since 00:00",
+            "- fired between 12:00 and 18:00: screen posts since 06:00",
+            "- fired between 18:00 and 00:00 the next day: screen posts since 12:00",
+        ])
+        lines = rr.windows("15 * * * *")
+        self.assertEqual(len(lines), 24)
+        self.assertEqual(lines[0], "- fired between 00:15 and 01:15: screen posts since 23:15 the day before")
+        self.assertEqual(rr.windows("0 */5 * * 1")[-1],
+                         "- fired between Mon 20:00 and the next Mon 00:00: screen posts since Mon 15:00")
+
     def test_unsupported_crons(self):
-        for expr in ("*/30 * * * *", "0 * * * *", "0 9 1 * *", "0 9 * 1 *", "0 9 * * MON",
-                     "0 9 * *", "0 24 * * *", "60 9 * * *", "0 9 * * 8", "0 9-7 * * *", "0 9,, * * *"):
+        for expr in ("*/30 * * * *", "* 9 * * *", "0 */0 * * *", "0 9/2 * * *", "0 9 1 * *", "0 9 * 1 *",
+                     "0 9 * * MON", "0 9 * *", "0 24 * * *", "60 9 * * *", "0 9 * * 8", "0 9-7 * * *",
+                     "0 9,, * * *"):
             with self.assertRaises(rr.RenderError, msg=expr):
                 rr.windows(expr)
 
@@ -182,6 +197,13 @@ class Release(unittest.TestCase):
         with self.assertRaises(rr.RenderError):
             rr.release(self.dir)
 
+    def test_repository_that_is_not_a_url(self):
+        self.write({"name": "upwork-skills", "version": "0.2.0",
+                    "repository": {"type": "git", "url": "https://github.com/x/y"}})
+        with self.assertRaises(rr.RenderError) as caught:
+            rr.release(self.dir)
+        self.assertIn("repository must be a string", str(caught.exception))
+
     def test_shipped_manifest(self):
         rel = rr.release(ROOT)
         self.assertEqual(rel["tag"], f"upwork-skills--v{rel['version']}")
@@ -209,6 +231,14 @@ class Main(unittest.TestCase):
         code, out, _ = self.run_main("--cron", "0 9 * * *", "--profile", EXAMPLE, "--draft-skill", fh.name)
         self.assertEqual(code, 0)
         self.assertIn("Open with their problem.", out)
+
+    def test_profile_with_a_byte_order_mark(self):
+        with tempfile.NamedTemporaryFile("wb", suffix=".md", delete=False) as fh:
+            fh.write(codecs.BOM_UTF8 + read(EXAMPLE).encode("utf-8"))
+        self.addCleanup(os.remove, fh.name)
+        code, out, err = self.run_main("--cron", "0 9 * * *", "--profile", fh.name)
+        self.assertEqual(code, 0, err)
+        self.assertEqual(between(out, rr.PROFILE_BEGIN, rr.PROFILE_END), read(EXAMPLE))
 
     def test_bad_cron(self):
         code, out, err = self.run_main("--cron", "*/30 * * * *", "--profile", EXAMPLE)

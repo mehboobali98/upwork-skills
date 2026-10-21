@@ -171,6 +171,12 @@ class FirstPass(unittest.TestCase):
         self.assertEqual(out[2]["skipped_by"], ["rate-below-floor", "full-time"])
         self.assertEqual(out[3]["skipped_by"], ["already-applied", "client-never-hired", "client-never-reviews"])
 
+    def test_rows_without_an_id_are_all_kept(self):
+        rows = load("rows.json")
+        bare = [{k: v for k, v in row.items() if k != "id"} for row in rows[:2]]
+        out = fixed_rules.first_pass(RULES, bare + rows[2:], SETTINGS, facts.parse_time("2026-10-20T20:00:00Z"))
+        self.assertEqual([r["job_id"] for r in out], [None, None, "2112473844631677510", "2112631294964854278"])
+
 
 class Cli(unittest.TestCase):
     def setUp(self):
@@ -212,6 +218,14 @@ class Cli(unittest.TestCase):
     def test_rows(self):
         code, text = self.run_main("--rows", self.path("rows.json", load("rows.json")), "--json")
         self.assertEqual((code, len(json.loads(text))), (0, 4))
+
+    def test_rows_take_no_job_options(self):
+        rows = self.path("rows.json", load("rows.json"))
+        for extra in (["--answers", self.path("answers.json", ANSWERS)], ["--lane", "rails"],
+                      ["--row", self.path("row.json", coach_row())]):
+            with self.assertRaises(SystemExit, msg=extra) as caught:
+                self.run_main("--rows", rows, *extra)
+            self.assertEqual(caught.exception.code, 2)
 
     def test_errors_exit_2(self):
         self.assertEqual(self.run_main("--job", "/nonexistent.json")[0], 2)

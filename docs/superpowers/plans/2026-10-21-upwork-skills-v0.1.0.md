@@ -3159,8 +3159,9 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bidlog.py" row --result screen.json
 prints the 30 `values` and the `ranges`. Read `<tab>!B:B` with the Google
 Sheets connector. If the job ID is in row n, update `<tab>!A<n>:T<n>` (the
 `screen` range) with the first 20 values; otherwise append all 30 values to
-`<tab>!A:AD`. Write with `valueInputOption` set to `RAW`: job IDs are 19
-digits, and a Sheet that parses them as numbers rounds them.
+`<tab>!A:AD`. The connector reads values the way the Sheets UI does: the
+19-digit job IDs stay text, and a date such as `2026-10-15` becomes a date
+cell.
 
 For a CSV (`log.type: csv`, with `path`):
 
@@ -3296,8 +3297,7 @@ Connects balance after.
 Then update the job's bid log row: `rate`, `proposal_id`, `submitted_at`
 (now, ISO 8601 with its offset) and `boost` (0 for none). For a Sheet, find
 the job in `<tab>!B:B` and update `<tab>!X<n>:AA<n>` (the `submit` range from
-`bidlog.py row`), plus `<tab>!AD<n>` for a SKIP override note, with
-`valueInputOption` set to `RAW` so the proposal ID stays text. For a CSV:
+`bidlog.py row`), plus `<tab>!AD<n>` for a SKIP override note. For a CSV:
 
 ```sh
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bidlog.py" update --csv <path> --job-id <job id> \

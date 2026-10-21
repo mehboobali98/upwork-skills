@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.3
+
+- The routine's prompt now spells out the per-post screen: every READ post
+  from the first pass gets `fixed_rules.py --job` with its own `job.json`,
+  and its judgement questions answered, before it gets a verdict. A rehearsal
+  with 58 rows fetched the 12 READ posts and then judged them by eye, so no
+  job-level rule ran and no question was answered. Run `/upwork-skills:routine`
+  again after updating.
+
 ## 0.2.2
 
 - The routine's prompt now tells the run to do all the work in its own

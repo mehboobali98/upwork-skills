@@ -1,0 +1,19 @@
+{
+  "data": {
+    "vendorProposal": {
+      "auditDetails": {
+        "createdDateTime": {"displayValue": "2026-10-21T20:18:47.833Z", "rawValue": "1792613927833"},
+        "modifiedDateTime": {"displayValue": "2026-10-21T20:18:47.833Z", "rawValue": "1792613927833"}
+      },
+      "boosted": false,
+      "id": "1000000000000000001",
+      "marketplaceJobPosting": {"content": {"title": "Senior systems auditor for a Rails messaging stack"}, "id": "2000000000000000001"},
+      "proposalCoverLetter": "",
+      "status": {"status": "Accepted", "status_label": "Submitted"},
+      "terms": {"chargeRate": {"currency": "USD", "displayValue": "USD 200.0", "rawValue": "200.0"}},
+      "viewedByClient": false
+    }
+  },
+  "plan": "Freelancer Plus",
+  "status": "ok"
+}

@@ -1,0 +1,19 @@
+{
+  "data": {
+    "vendorProposal": {
+      "auditDetails": {
+        "createdDateTime": {"displayValue": "2026-10-20T19:33:14.624Z", "rawValue": "1792524794624"},
+        "modifiedDateTime": {"displayValue": "2026-10-21T08:07:41.662Z", "rawValue": "1792570061662"}
+      },
+      "boosted": false,
+      "id": "1000000000000000002",
+      "marketplaceJobPosting": {"content": {"title": "Claude Code coach for a 5-person dev team"}, "id": "2000000000000000002"},
+      "proposalCoverLetter": "",
+      "status": {"status": "Accepted", "status_label": "Submitted"},
+      "terms": {"chargeRate": {"currency": "USD", "displayValue": "USD 85.0", "rawValue": "85.0"}},
+      "viewedByClient": true
+    }
+  },
+  "plan": "Freelancer Plus",
+  "status": "ok"
+}

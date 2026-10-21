@@ -76,7 +76,9 @@ def read_csv(path):
 
 
 def write_csv(path, rows):
-    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(os.path.abspath(path)), suffix=".csv")
+    folder = os.path.dirname(os.path.abspath(path))
+    os.makedirs(folder, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=folder, suffix=".csv")
     with os.fdopen(fd, "w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=COLUMNS)
         writer.writeheader()

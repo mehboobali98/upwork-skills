@@ -65,6 +65,11 @@ class Csv(unittest.TestCase):
         self.assertEqual((rows[0]["verdict"], rows[0]["screened_at"], rows[0]["rate"], rows[0]["proposal_id"]),
                          ("BID", "2026-10-21T15:00+05:00", "40", "1000000000000000001"))
 
+    def test_upsert_creates_the_log_folder(self):
+        path = os.path.join(self.dir, "upwork", "bids.csv")
+        bidlog.upsert_csv(path, bidlog.row_from_result(RESULT, AT))
+        self.assertEqual([r["job_id"] for r in bidlog.read_csv(path)], [JOB])
+
     def test_another_job_appends(self):
         bidlog.upsert_csv(self.csv, bidlog.row_from_result(RESULT, AT))
         other = dict(RESULT, facts=dict(FACTS, job_id="1"))

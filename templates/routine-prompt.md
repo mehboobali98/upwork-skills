@@ -54,12 +54,19 @@ It ends with every question still open, as one answers template keyed by job ID.
 
 {{drafting}}
 
-## 5. Report
+## 5. Pipeline
+
+Only the run that fired {{pipeline_fires}} does this section; any other run skips it. If the profile's log is a CSV, skip it too: the log isn't in this run.
+
+Read `/tmp/upwork-skills/skills/pipeline/SKILL.md` and follow it, including writing the outcome changes to the bid log. It comes after screening and drafting, so a failed check never costs a scan: if it fails, say why in the report and finish the report anyway.
+
+## 6. Report
 
 Open with:
 
 - the release, `{{tag}}`, and the window you screened;
 - the Connects balance and plan, and any Connects spent on something other than job applications in the last 7 days (`get_freelancer_dashboard`);
+- on the run that does section 5, the pipeline report, or why the check failed;
 - any connector tool you could see that isn't in the list above.
 
 Then the screen skill's report (its section 3), BIDs first, with each draft under its post. If nothing deserves a bid, say so plainly; that's a valid result.

@@ -1,0 +1,29 @@
+{
+  "count_note": "A reliable total is not available for status=\"Archived\". returned_count is exactly the number of matching records on this page.",
+  "data": {
+    "vendorProposals": {
+      "edges": [
+        {"node": {"auditDetails": {"createdDateTime": {"displayValue": "2026-09-12T10:52:09.078Z", "rawValue": "1789210329078"}},
+                  "boosted": true, "id": "1000000000000000004",
+                  "marketplaceJobPosting": {"content": {"title": "Code review engineer"}, "id": "2000000000000000004"},
+                  "status": {"reason": {"id": "85", "reason": "Job Posting Expired"}, "status": "Archived", "status_label": "Archived (job closed)"},
+                  "viewedByClient": false}},
+        {"node": {"auditDetails": {"createdDateTime": {"displayValue": "2026-09-06T11:34:25.087Z", "rawValue": "1788694465087"}},
+                  "boosted": true, "id": "1000000000000000009",
+                  "marketplaceJobPosting": {"content": {"title": "Need a Ruby on Rails developer"}, "id": "2000000000000000009"},
+                  "status": {"reason": {"id": "41", "reason": "Project was cancelled"}, "status": "Archived", "status_label": "Archived (job closed)"},
+                  "viewedByClient": false}},
+        {"node": {"auditDetails": {"createdDateTime": {"displayValue": "2026-09-07T16:21:13.293Z", "rawValue": "1788798073293"}},
+                  "boosted": true, "id": "1000000000000000008",
+                  "marketplaceJobPosting": {"content": {"title": "Rails developer for a live platform"}, "id": "2000000000000000008"},
+                  "status": {"reason": {"id": "85", "reason": "Job Posting Expired"}, "status": "Archived", "status_label": "Archived (job closed)"},
+                  "viewedByClient": false}}
+      ],
+      "pageInfo": {"endCursor": "eyJBY3RpdmUiOiIzIiwiQXJjaGl2ZSI6IjAifQ==", "hasNextPage": false},
+      "totalCount": 3
+    }
+  },
+  "hasMore": false,
+  "returned_count": 3,
+  "status": "ok"
+}

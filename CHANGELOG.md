@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0
+
+- New skill, `pipeline`. `scripts/outcomes.py` tracks each logged bid to
+  its outcome (sent, viewed, interview, offer, hired, lost, expired,
+  cancelled, closed, withdrawn or declined) from the proposal and its post,
+  and writes only the log's `outcome` and `outcome_at`. Upwork never marks a
+  proposal lost, and a filled post can stay open for weeks, so a loss is read
+  from the post's hires. An outcome never moves back, and only an offer or a
+  hire replaces `lost`. The skill also lists new invitations, offers and
+  unread messages, flags any that ask you to leave Upwork, be paid outside
+  it or work unpaid, and lists proposals the log has no row for.
+- `submit` writes `outcome=sent` with the submit time, so a new row is never
+  blank. The `submit` range is now `X:AC`.
+- The scheduled scan runs the `pipeline` check on each day's first run,
+  after screening, with the tools it already had. Run `/upwork-skills:routine`
+  again after updating.
+
 ## 0.2.6
 
 - A scan screens its READ posts in one batch: `fixed_rules.py --jobs DIR

@@ -1,0 +1,19 @@
+{
+  "data": {
+    "vendorProposal": {
+      "auditDetails": {
+        "createdDateTime": {"displayValue": "2026-09-12T10:52:09.078Z", "rawValue": "1789210329078"},
+        "modifiedDateTime": {"displayValue": "2026-09-13T23:20:22.599Z", "rawValue": "1789341622599"}
+      },
+      "boosted": true,
+      "id": "1000000000000000004",
+      "marketplaceJobPosting": {"content": {"title": "Code review engineer"}, "id": "2000000000000000004"},
+      "proposalCoverLetter": "",
+      "status": {"reason": {"id": "85", "reason": "Job Posting Expired"}, "status": "Archived", "status_label": "Archived (job closed)"},
+      "terms": {"chargeRate": {"currency": "USD", "displayValue": "USD 40.0", "rawValue": "40.0"}, "connectsBid": 2},
+      "viewedByClient": false
+    }
+  },
+  "plan": "Freelancer Plus",
+  "status": "ok"
+}

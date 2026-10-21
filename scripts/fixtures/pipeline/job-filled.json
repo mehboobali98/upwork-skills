@@ -1,0 +1,10 @@
+{
+  "data": {
+    "marketplaceJobPosting": {
+      "activityStat": {"jobActivity": {"invitesSent": 0, "totalHired": 1, "totalInvitedToInterview": 0, "totalOffered": 0}},
+      "contractTerms": {"contractType": "FIXED", "experienceLevel": "EXPERT", "personsToHire": 1},
+      "id": "2000000000000000005",
+      "workFlowState": {"status": "ACTIVE"}
+    }
+  }
+}

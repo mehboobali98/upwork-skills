@@ -7,10 +7,10 @@ description: Use when the user wants their scheduled Upwork scan (a Claude Code 
 
 Keeps a cloud routine that scans Upwork in step with the profile and the
 installed release. A routine can't install plugins, so its prompt clones this
-repo at the installed release's tag and follows the same `screen` skill and
-scripts a local session does. This skill renders that prompt, limits the
-routine's connector tools, shows what would change, and updates the routine
-only after the user's explicit yes.
+repo at the installed release's tag and follows the same `screen` and
+`pipeline` skills and scripts a local session does. This skill renders that
+prompt, limits the routine's connector tools, shows what would change, and
+updates the routine only after the user's explicit yes.
 
 It never creates or deletes a routine, and never changes its schedule, model
 or on/off state.

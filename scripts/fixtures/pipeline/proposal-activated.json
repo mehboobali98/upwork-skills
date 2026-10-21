@@ -1,0 +1,21 @@
+{
+  "data": {
+    "vendorProposal": {
+      "annotations": ["OnHold"],
+      "auditDetails": {
+        "createdDateTime": {"displayValue": "2026-10-15T14:51:54.614Z", "rawValue": "1792075914614"},
+        "modifiedDateTime": {"displayValue": "2026-10-21T07:45:58.352Z", "rawValue": "1792568758352"}
+      },
+      "boosted": false,
+      "id": "1000000000000000003",
+      "marketplaceJobPosting": {"content": {"title": "Screen recording for a Claude Code skills demo"}, "id": "2000000000000000003"},
+      "proposalCoverLetter": "",
+      "status": {"status": "Activated", "status_label": "Invitation accepted"},
+      "terms": {"chargeRate": {"currency": "USD", "displayValue": "USD 5.0", "rawValue": "5.0"}},
+      "viewedByClient": true
+    }
+  },
+  "plan": "Freelancer Plus",
+  "room_id": "room_00000000000000000000000000000003",
+  "status": "ok"
+}

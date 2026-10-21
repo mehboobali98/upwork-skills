@@ -43,7 +43,8 @@ def letter(index):
 
 RANGES = {
     "screen": f"A:{letter(len(SCREEN) - 1)}",
-    "submit": f"{letter(COLUMNS.index('rate'))}:{letter(COLUMNS.index('boost'))}",
+    "submit": f"{letter(COLUMNS.index('rate'))}:{letter(COLUMNS.index('outcome_at'))}",
+    "pipeline": f"{letter(COLUMNS.index('outcome'))}:{letter(COLUMNS.index('outcome_at'))}",
     "all": f"A:{letter(len(COLUMNS) - 1)}",
 }
 

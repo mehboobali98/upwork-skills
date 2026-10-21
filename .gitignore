@@ -1,0 +1,4 @@
+__pycache__/
+*.local.md
+/profile.md
+/bids.csv

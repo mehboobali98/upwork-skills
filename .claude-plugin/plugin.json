@@ -1,0 +1,14 @@
+{
+  "name": "upwork-skills",
+  "displayName": "Upwork skills",
+  "version": "0.1.0",
+  "description": "Screens Upwork posts against your own rules before you spend Connects, submits a proposal only after you approve the exact preview, and logs every bid with the signals it was judged on.",
+  "author": {
+    "name": "Mehboob Ali",
+    "url": "https://github.com/mehboobali98"
+  },
+  "homepage": "https://github.com/mehboobali98/upwork-skills",
+  "repository": "https://github.com/mehboobali98/upwork-skills",
+  "license": "MIT",
+  "keywords": ["upwork", "freelancing", "proposals", "connects"]
+}

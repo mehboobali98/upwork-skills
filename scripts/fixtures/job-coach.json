@@ -1,0 +1,29 @@
+{
+  "applied": false,
+  "can_apply": true,
+  "connects_balance": 50,
+  "connects_cost": 26,
+  "client_record": {"contracts_active": 3, "contracts_total": 19, "feedback_count": 15, "feedback_score": 5, "hire_rate_percent": 63, "hours_total": 17.83, "jobs_posted": 30, "jobs_with_hires": 19, "open_jobs": 1, "spend_total": "$4,436.24"},
+  "client_work_history": {
+    "closed": [
+      {"ended": "2025-09-30T08:58:03.113Z", "feedback_score": 5, "feedback_to_client_score": 5, "status": "CLOSED", "title": "Update 40 Microsoft Word Templates to New Formatting", "type": "FIXED"},
+      {"ended": "2024-01-10T18:35:49.000Z", "feedback_score": 5, "feedback_to_client_score": 5, "status": "CLOSED", "title": "Advanced Excel hierarchical numbering system", "type": "FIXED"},
+      {"ended": "2023-04-25T18:38:43.000Z", "feedback_to_client_score": 5, "status": "CLOSED", "title": "Proofread 1400 lines of text in Excel with ChatGPT 3.5. Get results in a new column. ", "type": "FIXED"},
+      {"ended": "2022-12-22T07:52:35.000Z", "feedback_score": 5, "feedback_to_client_score": 5, "status": "CLOSED", "title": "Create a custom Match Attax Playing Card", "type": "FIXED"},
+      {"ended": "2024-12-12T20:09:27.518Z", "feedback_to_client_score": 5, "title": "Extract data from website into Excel", "type": "FIXED"}
+    ],
+    "open": [
+      {"started": "2026-06-29T00:00:00.000Z", "status": "ACTIVE", "title": "AI Engineering Workflow Consultant", "type": "HOURLY"},
+      {"started": "2026-06-17T11:11:35.542Z", "title": "Paid trial: provisional rollout plan", "type": "FIXED"}
+    ]
+  },
+  "data": {"marketplaceJobPosting": {
+    "activityStat": {"jobActivity": {"invitesSent": 4, "totalHired": 0, "totalInvitedToInterview": 7, "totalOffered": 0}},
+    "content": {"description": "", "title": "Claude Code coach for a 5-person dev team (hands-on, about 8 hrs/week, 3 months)"},
+    "contractTerms": {"contractType": "HOURLY", "experienceLevel": "EXPERT", "hourlyContractTerms": {"engagementType": "PART_TIME", "hourlyBudgetMax": 130, "hourlyBudgetMin": 80, "hourlyBudgetType": "MANUAL"}, "personsToHire": 1},
+    "id": "2112569628814312909",
+    "url": "https://www.upwork.com/jobs/~022112569628814312909",
+    "workFlowState": {"status": "ACTIVE"}
+  }},
+  "preferred_qualifications": {"contractor_type": "All freelancers", "english_proficiency": "Any", "has_portfolio": false, "min_earnings": "Any", "min_hours_worked": 0, "min_job_success_score": 0, "rising_talent": false}
+}

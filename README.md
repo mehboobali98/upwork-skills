@@ -16,6 +16,7 @@ only after you've seen the exact preview and said yes.
 |---|---|
 | `screen` | Judges one post, or every new post in a time window, against the default rules and your profile. Returns BID, MAYBE or SKIP with the rule behind each reason, and logs BIDs and MAYBEs. |
 | `submit` | Checks for an existing proposal or invitation, checks the letter (no em dashes, no unfilled placeholders, under 5,000 characters), shows the exact preview with its Connects cost and the live boost bids, and submits only after your explicit yes. Never boosts unless you ask. |
+| `pipeline` | Tracks each logged bid to its outcome (sent, viewed, interview, offer, hired, or how it ended) from what Upwork returns, writes it to the bid log, and lists new invitations, offers and unread messages, flagging any that ask you to leave Upwork. Reads Upwork only; it never replies. |
 | `routine` | Keeps a scheduled Claude Code routine screening Upwork with the same rules: renders its prompt from your profile and the installed release, denies the connector tools a scan doesn't need, and updates the routine only after you approve the diff. |
 
 There's no proposal writer here, on purpose. A public drafting skill would sit
@@ -98,8 +99,13 @@ skill does.
 One row per BID or MAYBE, in a Google Sheet tab or a CSV, with the signals the
 post was judged on (proposals and age at screening, the client's record, the
 scores it gives freelancers) and, after `submit`, the rate, proposal ID and
-boost. Outcomes come later, so the rules can be tuned against what actually
-got a reply.
+boost. `pipeline` then keeps each bid's outcome up to date, so the rules can
+later be tuned against what actually got a reply.
+
+Upwork doesn't say when a post went to someone else: the post stays open and
+your proposal still reads as submitted. `pipeline` reads a loss from the
+post's hires instead, so a bid counts as lost once the post has as many hires
+as it asked for and none of them is you.
 
 ## Scheduled scan
 
@@ -108,7 +114,8 @@ closed. Routines can't install plugins, so `routine` writes a prompt that
 clones this repo at the release you have installed and follows the same skill
 and scripts. Your profile travels inside the prompt, which lives only in your
 routine. Each run screens the posts published since the previous scheduled
-run.
+run, and each day's first run also runs the `pipeline` check, so the bid
+log's outcomes stay current without you asking.
 
 1. Create the routine with `/schedule`: your schedule, the Upwork connector,
    and Google Sheets if your log is a Sheet. Any prompt will do; it gets
@@ -124,7 +131,7 @@ run.
    connectors it keeps and the tools it denies, and changes nothing until you
    say yes.
 
-The run can search, screen, log and draft. Every other tool of its connectors
+The run can search, screen, log, track outcomes and draft. Every other tool of its connectors
 is denied, so it can't submit, boost or message, whatever a post's text says.
 If you have a private `upwork-draft` skill, its instructions go into the
 prompt and the run drafts each BID; without one, it screens and reports.
@@ -164,11 +171,11 @@ before a release that touches `screen`, its rules or its scripts.
 
 ## Roadmap
 
-- 0.3: `pipeline`, which tracks views, interviews and hires per bid, and
-  `learn`, which proposes rule changes from the log and replays them against
-  past posts.
-- 0.4: an optional classifier for the judgement questions, adopted per
-  question only after it agrees with past decisions.
+- `learn`: view and interview rates by lane, and rule changes proposed from
+  the log and replayed against past posts, once the log has about 30 settled
+  bids.
+- An optional classifier for the judgement questions, adopted per question
+  only after it agrees with past decisions.
 
 ## License
 

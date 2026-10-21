@@ -6,7 +6,8 @@
 Prints the prompt. A routine can't install plugins, so the prompt has it clone
 this repo at the tag of the installed version and follow the same skill and
 scripts a local session does. Each scheduled fire screens the posts published
-since the previous scheduled fire; the cron gives those windows.
+since the previous scheduled fire; the cron gives those windows. Each
+scheduled day's first fire also runs the pipeline check.
 """
 import argparse
 import json
@@ -103,6 +104,13 @@ def windows(expr):
     return lines
 
 
+def pipeline_fires(expr):
+    """When each scheduled day's first fire can start: the run that checks the pipeline."""
+    minutes, hours, _ = parse_cron(expr)
+    firsts = windows(expr)[:: len(hours) * len(minutes)]
+    return " or ".join(line[len("- fired "):].split(": screen posts", 1)[0] for line in firsts)
+
+
 def strip_front_matter(text):
     if text.lstrip("﻿").startswith("---"):
         try:
@@ -152,6 +160,7 @@ def render(template, profile_text, rel, cron, allowed, draft_text=None):
         "tag": rel["tag"],
         "repo": rel["repo"],
         "windows": "\n".join(windows(cron)),
+        "pipeline_fires": pipeline_fires(cron),
         "allowed_tools": allowed_tools(allowed),
         "drafting": drafting(draft_text),
         "profile": _block(PROFILE_BEGIN, profile_text, PROFILE_END, "profile"),

@@ -90,6 +90,23 @@ class Windows(unittest.TestCase):
                 rr.windows(expr)
 
 
+class PipelineFires(unittest.TestCase):
+    def test_daily_list(self):
+        self.assertEqual(rr.pipeline_fires("0 9,14,18,22 * * *"), "between 09:00 and 14:00")
+
+    def test_single_daily_time(self):
+        self.assertEqual(rr.pipeline_fires("30 6 * * *"), "between 06:30 and 06:30 the next day")
+
+    def test_weekdays_take_each_day_s_first_fire(self):
+        self.assertEqual(rr.pipeline_fires("0 9,18 * * 1-5"), " or ".join(
+            f"between {d} 09:00 and {d} 18:00" for d in ("Mon", "Tue", "Wed", "Thu", "Fri")))
+        self.assertEqual(rr.pipeline_fires("0 9 * * 1,4"),
+                         "between Mon 09:00 and Thu 09:00 or between Thu 09:00 and the next Mon 09:00")
+
+    def test_two_minutes_in_one_hour(self):
+        self.assertEqual(rr.pipeline_fires("0,30 9 * * *"), "between 09:00 and 09:30")
+
+
 class Drafting(unittest.TestCase):
     def test_no_draft_skill(self):
         self.assertEqual(rr.drafting(None), rr.NO_DRAFT)
@@ -163,6 +180,14 @@ class Render(unittest.TestCase):
         self.assertIn('the time after "since"', self.prompt)
         self.assertIn(rr.DRAFT_PREFACE, self.prompt)
         self.assertIn("- Upwork: find_jobs, get_profile", self.prompt)
+
+    def test_pipeline_runs_once_a_day_after_the_scan(self):
+        self.assertIn("Only the run that fired between 09:00 and 14:00 does this section", self.prompt)
+        self.assertIn("Read `/tmp/upwork-skills/skills/pipeline/SKILL.md` and follow it", self.prompt)
+        self.assertIn("If the profile's log is a CSV, skip it too", self.prompt)
+        self.assertLess(self.prompt.index("## 4. Draft"), self.prompt.index("## 5. Pipeline"))
+        self.assertLess(self.prompt.index("## 5. Pipeline"), self.prompt.index("## 6. Report"))
+        self.assertIn("- on the run that does section 5, the pipeline report, or why the check failed;", self.prompt)
 
     def test_without_a_draft_skill(self):
         prompt = rr.render(read(TEMPLATE), self.profile, REL, "0 9 * * *", ALLOWED)

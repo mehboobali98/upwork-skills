@@ -1,0 +1,30 @@
+schema_version: "1.0"
+name: no-reviews
+description: "A fixed-price review from a client who has never left a review, with nobody invited or interviewed."
+context:
+  scaffold_script: setup.sh
+execution:
+  prompt: "Is this worth bidding on? https://www.upwork.com/jobs/Review-of-unfinished-portfolio-website_~022112631294964854278/"
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Bash, Write]
+runs: 3
+graders:
+  - type: "regex"
+    name: "verdict"
+    pattern: "^\\W{0,6}SKIP\\b"
+  - type: "regex"
+    name: "never-reviews"
+    pattern: "client-never-reviews"
+    flags: "i"
+  - type: "tool_used"
+    name: "ran-job-rules"
+    tool: "Bash"
+    input_match: "fixed_rules\\.py.{0,4}--job"
+    min: 1
+    weight: 0.5
+  - type: "regex"
+    name: "profile-org-uid"
+    target: "mock_calls"
+    pattern: "1000000000000000001"
+    weight: 0.5

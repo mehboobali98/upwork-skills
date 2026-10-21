@@ -1,0 +1,35 @@
+{
+  "tools": [
+    {
+      "name": "find_jobs",
+      "description": "Marketplace job postings: search them by keywords and filters, get one by id, or get the jobs recommended for the freelancer's own profile (smart_search).\nActions: search, get, smart_search.\nget: params.id (numeric id, ~02 ciphertext or job URL). search: params.title, params.sort, params.limit; results are in jobs. smart_search: params.mode, params.days_posted or params.from_date.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "search",
+              "get",
+              "smart_search"
+            ],
+            "description": "The operation to perform"
+          },
+          "org_uid": {
+            "type": "string",
+            "description": "Your Upwork org_uid from list_accounts"
+          },
+          "params": {
+            "type": "object",
+            "description": "Action-specific parameters"
+          }
+        },
+        "required": [
+          "action",
+          "org_uid"
+        ],
+        "additionalProperties": true
+      }
+    }
+  ]
+}

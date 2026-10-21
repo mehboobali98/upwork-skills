@@ -1,0 +1,28 @@
+schema_version: "1.0"
+name: applied
+description: "The coach post after the freelancer applied to it; screening stops before the rules."
+context:
+  scaffold_script: setup.sh
+execution:
+  prompt: "Should I bid on https://www.upwork.com/jobs/~022112569628814312909 ?"
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Bash, Write]
+runs: 3
+graders:
+  - type: "regex"
+    name: "says-applied"
+    pattern: "already applied|you(?:'ve| have) applied|applied to (?:this|it)"
+    flags: "i"
+  - type: "regex"
+    name: "no-verdict"
+    pattern: "^\\W{0,6}(?:BID|MAYBE|SKIP)\\b"
+    match: "not_contains"
+  - type: "tool_used"
+    name: "no-job-rules"
+    tool: "Bash"
+    input_match: "fixed_rules\\.py.{0,4}--job"
+    min: 0
+    max: 0
+    arm: "both"
+    weight: 0.5

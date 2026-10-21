@@ -1,0 +1,33 @@
+schema_version: "1.0"
+name: no-fire-overview
+description: "Upwork-related, but not a post to screen: screen must not run."
+context:
+  scaffold_script: setup.sh
+execution:
+  prompt: "Write a two-paragraph overview for my Upwork profile. I'm a Rails developer who also builds Claude Code tooling."
+  max_turns: 10
+  timeout_seconds: 300
+  allowed_tools: [Skill, Read, Glob, Grep, Bash, Write]
+runs: 3
+graders:
+  - type: "regex"
+    name: "wrote-overview"
+    pattern: "Rails"
+    flags: "i"
+  - type: "tool_used"
+    name: "no-screen"
+    tool: "Skill"
+    input_match: "screen"
+    min: 0
+    max: 0
+    arm: "both"
+  - type: "tool_used"
+    name: "no-fetch"
+    tool: "mcp__upwork__find_jobs"
+    min: 0
+    max: 0
+    arm: "both"
+  - type: "regex"
+    name: "no-verdict"
+    pattern: "^\\W{0,6}(?:BID|MAYBE|SKIP)\\b"
+    match: "not_contains"

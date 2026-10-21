@@ -77,7 +77,8 @@ else. Without one, the routine screens and reports but doesn't draft.
 ## 4. Connectors and tools
 
 Keep the connection whose `name` contains `upwork`, and the one containing
-`sheets` when `log.type` is `sheet`. Propose removing every other connection:
+`sheets` when `log.type` is `sheet`, ignoring case: `Upwork` and
+`Google_Sheets` both match. Propose removing every other connection:
 the deny list below covers only these two, so any other connector would give
 the run all its tools. If a needed connection is missing, stop and tell the
 user to add it on the routine's page at https://claude.ai/code/routines and

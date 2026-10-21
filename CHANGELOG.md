@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.2.4
+
+- **The location rules work.** `location-excluded` and
+  `location-preferred-elsewhere` read a shape no real response has: Upwork
+  returns `preferred_locations` as `{countries, location_required}` beside
+  `preferred_qualifications`, not inside it. Both rules were silently false
+  on every post. A post that names places other than countries, or a profile
+  without `country`, now reports the rules as unknown. New fixture
+  `job-location.json`, trimmed from a real Poland-only post.
+- A profile saved with a UTF-8 byte-order mark now loads.
+- The settings the rules read must be numbers: `rates.floor_hourly`,
+  `availability.hours_per_week`, `connects.min_balance` and the
+  `qualifications` figures. A value like `floor_hourly: "$25"` used to load
+  and leave its rule unknown on every post; now the profile check names it.
+  `country` must be text and `qualifications.rising_talent` true or false.
+- `fixed_rules.py --rows` refuses `--row`, `--answers` and `--lane`, which it
+  used to ignore. A first pass runs only the fixed rules.
+- The first pass keeps every search row without a job ID. It used to keep the
+  first one and drop the rest as duplicates.
+- The routine's cron hours can be `*` or `*/n`, as in `0 */6 * * *`.
+- A `repository` in `plugin.json` that isn't a string gets its own error,
+  instead of "plugin.json has no repository".
+- The `routine` skill says its connection names match in any case, and the
+  README's profile check works from an installed plugin.
+
 ## 0.2.3
 
 - The routine's prompt now spells out the per-post screen: every READ post

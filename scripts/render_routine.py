@@ -40,10 +40,16 @@ class RenderError(ValueError):
     pass
 
 
-def _numbers(field, low, high, name):
+def _numbers(field, low, high, name, every=False):
     values = set()
     for part in field.split(","):
-        if re.fullmatch(r"\d+-\d+", part):
+        step = re.fullmatch(r"\*(?:/(\d+))?", part) if every else None
+        if step:
+            n = int(step.group(1) or 1)
+            if n < 1:
+                raise RenderError(f"cron {name}: {part} steps by 0")
+            values.update(range(low, high + 1, n))
+        elif re.fullmatch(r"\d+-\d+", part):
             start, end = (int(x) for x in part.split("-"))
             if start > end:
                 raise RenderError(f"cron {name}: {part} runs backwards")
@@ -67,7 +73,7 @@ def parse_cron(expr):
     if dom != "*" or month != "*":
         raise RenderError("cron: day of month and month must be *")
     minutes = _numbers(minute, 0, 59, "minute")
-    hours = _numbers(hour, 0, 23, "hour")
+    hours = _numbers(hour, 0, 23, "hour", every=True)
     weekdays = None if dow == "*" else sorted({d % 7 for d in _numbers(dow, 0, 7, "day of week")})
     return minutes, hours, weekdays
 
@@ -125,8 +131,10 @@ def release(plugin_root):
     with open(os.path.join(plugin_root, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
         manifest = json.load(fh)
     for key in ("name", "version", "repository"):
-        if not isinstance(manifest.get(key), str) or not manifest[key]:
+        if not manifest.get(key):
             raise RenderError(f"plugin.json has no {key}")
+        if not isinstance(manifest[key], str):
+            raise RenderError(f"plugin.json: {key} must be a string, not {json.dumps(manifest[key])}")
     return {
         "version": manifest["version"],
         "tag": f"{manifest['name']}--v{manifest['version']}",
@@ -174,7 +182,7 @@ def main(argv=None):
     template = args.template or os.path.join(args.plugin_root, "templates", "routine-prompt.md")
     try:
         profile = profile_loader.load_profile(args.profile)
-        with open(profile["path"], encoding="utf-8") as fh:
+        with open(profile["path"], encoding="utf-8-sig") as fh:
             profile_text = fh.read()
         draft_text = _read(args.draft_skill) if args.draft_skill else None
         allowed = routine_tools.load_allowed(os.path.join(args.plugin_root, "rules", "routine-tools.yaml"))

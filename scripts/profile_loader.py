@@ -25,6 +25,12 @@ CHANGE_KEYS = {"off", "check", "ask", "fires_when", "effect", "reason", "overrid
 OVERRIDE_KEYS = {"check", "ask", "reason"}
 KINDS = {"fixed", "judgement"}
 EFFECTS = {"SKIP", "MAYBE", "NOTE"}
+NUMBER_SETTINGS = {
+    "rates": ("floor_hourly",),
+    "availability": ("hours_per_week",),
+    "connects": ("min_balance",),
+    "qualifications": ("job_success_score", "hours_worked", "earnings"),
+}
 
 
 class ProfileError(ValueError):
@@ -47,7 +53,7 @@ def split_front_matter(text):
 
 def load_profile(path=None):
     path = os.path.expanduser(path or default_path())
-    with open(path, encoding="utf-8") as fh:
+    with open(path, encoding="utf-8-sig") as fh:
         text = fh.read()
     try:
         settings_text, body = split_front_matter(text)
@@ -154,6 +160,21 @@ def _check_settings(settings):
             raise ProfileError(f"lane {lane['name']}: skip_at_proposals must be a whole number above 0")
     if not isinstance(settings.get("rule_overrides") or {}, dict):
         raise ProfileError("rule_overrides must map rule ids to changes")
+    if not isinstance(settings.get("country") or "", str):
+        raise ProfileError("country must be a country's name")
+    for section, keys in NUMBER_SETTINGS.items():
+        values = settings.get(section)
+        if values is None:
+            continue
+        if not isinstance(values, dict):
+            raise ProfileError(f"{section} must be 'key: value' lines")
+        for key in keys:
+            value = values.get(key)
+            if value is not None and (isinstance(value, bool) or not isinstance(value, (int, float))):
+                raise ProfileError(f"{section}.{key} must be a number, not {value!r}")
+    rising = (settings.get("qualifications") or {}).get("rising_talent")
+    if rising is not None and not isinstance(rising, bool):
+        raise ProfileError("qualifications.rising_talent must be true or false")
 
 
 def main(argv=None):

@@ -61,9 +61,10 @@ def first_pass(rules, rows, settings, now=None):
     seen, out = set(), []
     for row in rows:
         f = facts.build(row=row, settings=settings, now=now)
-        if f["job_id"] in seen:
-            continue
-        seen.add(f["job_id"])
+        if f["job_id"] is not None:
+            if f["job_id"] in seen:
+                continue
+            seen.add(f["job_id"])
         verdict = screen(fixed, f)
         out.append({
             "job_id": f["job_id"], "title": f["title"], "url": f["url"], "lane": f["lane"],
@@ -202,6 +203,8 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if bool(args.job) == bool(args.rows):
         ap.error("pass --job or --rows")
+    if args.rows and (args.row or args.answers or args.lane):
+        ap.error("--row, --answers and --lane go with --job; a first pass runs only the fixed rules")
     try:
         now = facts.parse_time(args.now) if args.now else None
         if args.now and now is None:

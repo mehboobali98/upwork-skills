@@ -94,17 +94,22 @@ class FromJob(unittest.TestCase):
         self.assertEqual(f["unmet_qualification_count"], 3)
 
     def test_locations(self):
-        job = load("job-coach.json")
-        quals = job["preferred_qualifications"]
-        quals["preferred_locations"] = ["United States", "Canada"]
-        f = facts.build(job=job, settings=SETTINGS, now=NOW)
-        self.assertEqual((f["location_excluded"], f["location_preferred_elsewhere"]), (False, True))
-        quals["location_required"] = True
-        f = facts.build(job=job, settings=SETTINGS, now=NOW)
-        self.assertEqual((f["location_excluded"], f["location_preferred_elsewhere"]), (True, False))
-        quals["preferred_locations"] = [{"name": "Pakistan"}]
-        f = facts.build(job=job, settings=SETTINGS, now=NOW)
-        self.assertEqual((f["location_excluded"], f["location_preferred_elsewhere"]), (False, False))
+        def where(job, settings=SETTINGS):
+            f = facts.build(job=job, settings=settings, now=NOW)
+            return f["location_excluded"], f["location_preferred_elsewhere"]
+
+        job = load("job-location.json")
+        self.assertEqual(where(job), (False, True))
+        job["preferred_locations"]["location_required"] = True
+        self.assertEqual(where(job), (True, False))
+        job["preferred_locations"]["countries"] = ["Poland", "pakistan"]
+        self.assertEqual(where(job), (False, False))
+
+    def test_location_that_cant_be_told(self):
+        job = load("job-location.json")
+        self.assertEqual(facts.build(job=job, settings=dict(SETTINGS, country=None), now=NOW)["location_excluded"], None)
+        job["preferred_locations"] = {"countries": [], "regions": ["Europe"], "location_required": True}
+        self.assertEqual(facts.build(job=job, settings=SETTINGS, now=NOW)["location_excluded"], None)
 
 
 class FromRow(unittest.TestCase):

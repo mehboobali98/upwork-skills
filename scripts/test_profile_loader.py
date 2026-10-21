@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Tests for profile_loader.py. Run with: python3 test_profile_loader.py"""
+import codecs
 import contextlib
 import io
 import json
@@ -63,6 +64,31 @@ class FrontMatter(unittest.TestCase):
         for settings in bad:
             with self.assertRaises(profile_loader.ProfileError, msg=settings):
                 profile_loader.load_profile(self.write(f"---\n{settings}---\n"))
+
+    def test_byte_order_mark_is_ignored(self):
+        path = os.path.join(self.dir, "profile.md")
+        with open(EXAMPLE, "rb") as src, open(path, "wb") as fh:
+            fh.write(codecs.BOM_UTF8 + src.read())
+        self.assertEqual(profile_loader.load_profile(path)["settings"]["country"], "Portugal")
+
+    def test_rule_settings_are_checked(self):
+        bad = [
+            'rates:\n  floor_hourly: "$25"\n',
+            "availability:\n  hours_per_week: twenty\n",
+            "connects:\n  min_balance: true\n",
+            "qualifications:\n  job_success_score: 90%\n",
+            "qualifications:\n  rising_talent: no thanks\n",
+            "rates: 25\n",
+            "country: 7\n",
+        ]
+        for settings in bad:
+            with self.assertRaises(profile_loader.ProfileError, msg=settings):
+                profile_loader.load_profile(self.write(f"---\n{settings}---\n"))
+
+    def test_string_threshold_is_named(self):
+        with self.assertRaises(profile_loader.ProfileError) as caught:
+            profile_loader.load_profile(self.write('---\nrates:\n  floor_hourly: "$25"\n---\n'))
+        self.assertIn("rates.floor_hourly must be a number, not '$25'", str(caught.exception))
 
 
 class Rules(unittest.TestCase):

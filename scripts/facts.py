@@ -34,6 +34,9 @@ def build(job=None, row=None, settings=None, now=None, lane=None):
         _from_row(f, row)
     quals = _from_job(f, job) if job else None
     _derive(f, settings, quals, now or datetime.now(timezone.utc))
+    if job:
+        f["location_excluded"], f["location_preferred_elsewhere"] = _location(
+            job.get("preferred_locations"), settings.get("country"))
     _lane(f, settings, lane)
     return f
 
@@ -194,21 +197,22 @@ def _derive(f, settings, quals, now):
     if quals is not None:
         f["unmet_qualifications"] = unmet_qualifications(quals, settings.get("qualifications") or {})
         f["unmet_qualification_count"] = len(f["unmet_qualifications"])
-        f["location_excluded"], f["location_preferred_elsewhere"] = _location(quals, settings.get("country"))
 
 
-def _location(quals, country):
-    places = quals.get("preferred_locations") or quals.get("locations") or []
-    names = []
-    for place in places if isinstance(places, list) else [places]:
-        name = (place.get("name") or place.get("country")) if isinstance(place, dict) else place
-        if isinstance(name, str):
-            names.append(name.strip().lower())
-    if not names or not country:
+def _location(block, country):
+    """(excluded, preferred elsewhere) from a get response's preferred_locations, or Nones when it can't be told."""
+    if not isinstance(block, dict):
         return False, False
-    outside = country.strip().lower() not in names
-    required = bool(quals.get("location_required"))
-    return outside and required, outside and not required
+    names = {str(c).strip().lower() for c in block.get("countries") or []}
+    elsewhere = any(v for k, v in block.items() if k not in ("countries", "location_required"))
+    if not names and not elsewhere:
+        return False, False
+    if country and country.strip().lower() in names:
+        return False, False
+    if not country or elsewhere:
+        return None, None
+    required = bool(block.get("location_required"))
+    return required, not required
 
 
 def _lane(f, settings, chosen):

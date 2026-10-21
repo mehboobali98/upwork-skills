@@ -1,0 +1,28 @@
+{
+  "applied": false,
+  "can_apply": true,
+  "connects_balance": 50,
+  "connects_cost": 27,
+  "client_record": {"contracts_active": 28, "contracts_total": 184, "feedback_count": 135, "feedback_score": 4.97, "hire_rate_percent": 100, "hours_total": 49825.67, "jobs_posted": 60, "jobs_with_hires": 160, "open_jobs": 1, "spend_total": "$355,536.08"},
+  "client_work_history": {
+    "closed": [
+      {"ended": "2026-06-23T04:56:00.583Z", "feedback_score": 5, "feedback_to_client_score": 5, "title": "Chrome Extension Updates", "type": "HOURLY"},
+      {"ended": "2026-05-12T03:25:43.950Z", "feedback_score": 5, "feedback_to_client_score": 5, "status": "CLOSED", "title": "Product Owner/Project Manager", "type": "HOURLY"},
+      {"ended": "2026-09-30T22:06:02.768Z", "feedback_score": 5, "feedback_to_client_score": 5, "status": "CLOSED", "title": "Full Stack Developer with Golang and Javascript Expertise", "type": "HOURLY"}
+    ],
+    "open": [
+      {"started": "2026-08-01T20:14:57.082Z", "title": "Forms Redesign", "type": "FIXED"},
+      {"started": "2026-07-29T18:33:50.464Z", "status": "ACTIVE", "title": "Chrome Extension Developer Needed", "type": "HOURLY"},
+      {"started": "2026-04-02T07:45:52.231Z", "status": "ACTIVE", "title": "Full Stack Developer with Golang and Javascript Expertise", "type": "HOURLY"}
+    ]
+  },
+  "data": {"marketplaceJobPosting": {
+    "activityStat": {"jobActivity": {"invitesSent": 0, "totalHired": 0, "totalInvitedToInterview": 3, "totalOffered": 0}},
+    "content": {"description": "", "title": "Software Engineer for AI"},
+    "contractTerms": {"contractType": "HOURLY", "experienceLevel": "INTERMEDIATE", "hourlyContractTerms": {"engagementType": "FULL_TIME", "hourlyBudgetMax": 20, "hourlyBudgetMin": 15, "hourlyBudgetType": "MANUAL"}, "personsToHire": 1},
+    "id": "2112409205120428441",
+    "url": "https://www.upwork.com/jobs/~022112409205120428441",
+    "workFlowState": {"status": "ACTIVE"}
+  }},
+  "preferred_qualifications": {"english_proficiency": "Fluent", "has_portfolio": false, "min_hours_worked": 0, "min_job_success_score": 0, "rising_talent": false}
+}

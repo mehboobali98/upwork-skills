@@ -1,0 +1,100 @@
+[
+  {
+    "budget": "80.00–130.00/hr",
+    "client": {
+      "country": "Ireland",
+      "rating": 5,
+      "total_posted_jobs": 30,
+      "total_reviews": 15,
+      "total_spent": "$4,436.24",
+      "verification_status": "VERIFIED"
+    },
+    "duration": "1 to 3 months",
+    "engagement": "PART_TIME",
+    "id": "2112569628814312909",
+    "job_type": "hourly",
+    "proposal_count": 54,
+    "published_date": "2026-10-20T15:43:28.951Z",
+    "skills": [
+      "AI Agent Development",
+      "Claude Code",
+      "Model Context Protocol (MCP)"
+    ],
+    "title": "Claude Code coach for a 5-person dev team (hands-on, about 8 hrs/week, 3 months)",
+    "url": "https://www.upwork.com/jobs/~022112569628814312909?utm_campaign=LLM_claude_MCP_jobpost"
+  },
+  {
+    "budget": "15.00–35.00/hr",
+    "client": {
+      "country": "United States",
+      "rating": 5,
+      "total_posted_jobs": 20,
+      "total_reviews": 2,
+      "total_spent": "$3,323.22",
+      "verification_status": "VERIFIED"
+    },
+    "duration": "Less than 1 month",
+    "engagement": "PART_TIME",
+    "id": "2112562681382316976",
+    "job_type": "hourly",
+    "proposal_count": 41,
+    "published_date": "2026-10-20T15:14:20.871Z",
+    "skills": [
+      "Web Development",
+      "WordPress",
+      "JavaScript",
+      "HTML",
+      "PHP",
+      "Java",
+      "Web Design"
+    ],
+    "title": "Claude Code Developer Needed – Quick Project Cleanup & Launch (2–3 Hours)",
+    "url": "https://www.upwork.com/jobs/~022112562681382316976?utm_campaign=LLM_claude_MCP_jobpost"
+  },
+  {
+    "budget": "8.00–15.00/hr",
+    "client": {
+      "country": "United States",
+      "rating": 4.99,
+      "total_posted_jobs": 31,
+      "total_reviews": 17,
+      "total_spent": "$10,727.67",
+      "verification_status": "VERIFIED"
+    },
+    "duration": "More than 6 months",
+    "engagement": "FULL_TIME",
+    "id": "2112473844631677510",
+    "job_type": "hourly",
+    "proposal_count": 42,
+    "published_date": "2026-10-20T09:19:53.282Z",
+    "skills": [
+      "TypeScript",
+      "API Integration",
+      "GitHub",
+      "Cloudflare",
+      "Claude",
+      "AI Automation",
+      "Node.js",
+      "API"
+    ],
+    "title": "AI Automation Developer (Claude Code, TypeScript, Cloudflare Workers)",
+    "url": "https://www.upwork.com/jobs/~022112473844631677510?utm_campaign=LLM_claude_MCP_jobpost"
+  },
+  {
+    "applied": true,
+    "budget": "$250.00",
+    "client": {
+      "country": "Germany",
+      "verification_status": "VERIFIED"
+    },
+    "id": "2112631294964854278",
+    "job_type": "fixed",
+    "proposals_tier": "20 to 50",
+    "published_date": "2026-10-20T19:46:42.608Z",
+    "skills": [
+      "Web Development"
+    ],
+    "title": "Review of unfinished portfolio website (Vercel/GitHub, DE/EN) + launch plan",
+    "url": "https://www.upwork.com/jobs/~022112631294964854278?utm_campaign=LLM_claude_MCP_jobpost"
+  }
+]

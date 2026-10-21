@@ -73,22 +73,27 @@ def parse_cron(expr):
 
 
 def windows(expr):
-    """One line per scheduled fire, naming the window it screens."""
+    """One line per scheduled fire: the span a late start can fall in, and the window to screen."""
     minutes, hours, weekdays = parse_cron(expr)
     times = [(h, m) for h in hours for m in minutes]
+    lines = []
     if weekdays is None:
-        lines = []
+        last = len(times) - 1
         for i, (h, m) in enumerate(times):
             ph, pm = times[i - 1]
+            nh, nm = times[(i + 1) % len(times)]
+            until = f"{nh:02d}:{nm:02d}" + (" the next day" if i == last else "")
             since = f"{ph:02d}:{pm:02d}" + (" the day before" if i == 0 else "")
-            lines.append(f"- {h:02d}:{m:02d}: posts since {since}")
+            lines.append(f"- fired between {h:02d}:{m:02d} and {until}: screen posts since {since}")
         return lines
     fires = [(d, h, m) for d in weekdays for (h, m) in times]
-    lines = []
+    last = len(fires) - 1
     for i, (d, h, m) in enumerate(fires):
         pd, ph, pm = fires[i - 1]
+        nd, nh, nm = fires[(i + 1) % len(fires)]
+        until = ("the next " if i == last else "") + f"{DAYS[nd]} {nh:02d}:{nm:02d}"
         since = f"{DAYS[pd]} {ph:02d}:{pm:02d}" + (" the week before" if i == 0 else "")
-        lines.append(f"- {DAYS[d]} {h:02d}:{m:02d}: posts since {since}")
+        lines.append(f"- fired between {DAYS[d]} {h:02d}:{m:02d} and {until}: screen posts since {since}")
     return lines
 
 

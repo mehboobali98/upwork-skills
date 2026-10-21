@@ -33,36 +33,39 @@ def between(text, begin, end):
 class Windows(unittest.TestCase):
     def test_daily_list(self):
         self.assertEqual(rr.windows("0 9,14,18,22 * * *"), [
-            "- 09:00: posts since 22:00 the day before",
-            "- 14:00: posts since 09:00",
-            "- 18:00: posts since 14:00",
-            "- 22:00: posts since 18:00",
+            "- fired between 09:00 and 14:00: screen posts since 22:00 the day before",
+            "- fired between 14:00 and 18:00: screen posts since 09:00",
+            "- fired between 18:00 and 22:00: screen posts since 14:00",
+            "- fired between 22:00 and 09:00 the next day: screen posts since 18:00",
         ])
 
     def test_single_daily_time(self):
-        self.assertEqual(rr.windows("30 6 * * *"), ["- 06:30: posts since 06:30 the day before"])
+        self.assertEqual(rr.windows("30 6 * * *"),
+                         ["- fired between 06:30 and 06:30 the next day: screen posts since 06:30 the day before"])
 
     def test_two_minutes_in_one_hour(self):
         self.assertEqual(rr.windows("0,30 9 * * *"), [
-            "- 09:00: posts since 09:30 the day before",
-            "- 09:30: posts since 09:00",
+            "- fired between 09:00 and 09:30: screen posts since 09:30 the day before",
+            "- fired between 09:30 and 09:00 the next day: screen posts since 09:00",
         ])
 
     def test_weekday_list(self):
         self.assertEqual(rr.windows("0 9 * * 1,4"), [
-            "- Mon 09:00: posts since Thu 09:00 the week before",
-            "- Thu 09:00: posts since Mon 09:00",
+            "- fired between Mon 09:00 and Thu 09:00: screen posts since Thu 09:00 the week before",
+            "- fired between Thu 09:00 and the next Mon 09:00: screen posts since Mon 09:00",
         ])
 
     def test_weekday_range_and_two_times(self):
         lines = rr.windows("0 9,18 * * 1-5")
-        self.assertEqual(lines[0], "- Mon 09:00: posts since Fri 18:00 the week before")
-        self.assertEqual(lines[1], "- Mon 18:00: posts since Mon 09:00")
-        self.assertEqual(lines[2], "- Tue 09:00: posts since Mon 18:00")
+        self.assertEqual(lines[0], "- fired between Mon 09:00 and Mon 18:00: screen posts since Fri 18:00 the week before")
+        self.assertEqual(lines[1], "- fired between Mon 18:00 and Tue 09:00: screen posts since Mon 09:00")
+        self.assertEqual(lines[2], "- fired between Tue 09:00 and Tue 18:00: screen posts since Mon 18:00")
+        self.assertEqual(lines[9], "- fired between Fri 18:00 and the next Mon 09:00: screen posts since Fri 09:00")
         self.assertEqual(len(lines), 10)
 
     def test_seven_is_sunday(self):
-        self.assertEqual(rr.windows("0 8 * * 7"), ["- Sun 08:00: posts since Sun 08:00 the week before"])
+        self.assertEqual(rr.windows("0 8 * * 7"),
+                         ["- fired between Sun 08:00 and the next Sun 08:00: screen posts since Sun 08:00 the week before"])
         self.assertEqual(rr.windows("0 8 * * 0,7"), rr.windows("0 8 * * 0"))
 
     def test_unsupported_crons(self):
@@ -131,7 +134,8 @@ class Render(unittest.TestCase):
         self.assertIn("$HOME/.config/upwork-skills/profile.md", self.prompt)
 
     def test_windows_drafting_and_tools(self):
-        self.assertIn("- 09:00: posts since 22:00 the day before", self.prompt)
+        self.assertIn("- fired between 09:00 and 14:00: screen posts since 22:00 the day before", self.prompt)
+        self.assertIn('the time after "since"', self.prompt)
         self.assertIn(rr.DRAFT_PREFACE, self.prompt)
         self.assertIn("- Upwork: find_jobs, get_profile", self.prompt)
 
@@ -185,7 +189,7 @@ class Main(unittest.TestCase):
     def test_prints_the_prompt(self):
         code, out, err = self.run_main("--cron", "0 9 * * 1,4", "--profile", EXAMPLE)
         self.assertEqual(code, 0, err)
-        self.assertIn("- Mon 09:00: posts since Thu 09:00 the week before", out)
+        self.assertIn("- fired between Mon 09:00 and Thu 09:00: screen posts since Thu 09:00 the week before", out)
         self.assertIn(rr.NO_DRAFT, out)
         self.assertEqual(between(out, rr.PROFILE_BEGIN, rr.PROFILE_END), read(EXAMPLE))
 

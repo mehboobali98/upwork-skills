@@ -98,8 +98,22 @@ Default to the last 24 hours and say so.
    python3 "${CLAUDE_PLUGIN_ROOT}/scripts/fixed_rules.py" --rows rows.json --json
    ```
 
-3. Screen each READ post in full as in section 1, using the row you already
-   have instead of searching for it.
+3. Screen the READ posts together. Fetch each with `find_jobs action=get`
+   (stop for any with `applied` true) and save it as `jobs/<job id>.json`,
+   trimmed as section 1, step 2, says. Then run the rules on all of them,
+   finding each post's row in `rows.json` by ID:
+
+   ```sh
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/fixed_rules.py" --jobs jobs --rows rows.json --out results
+   ```
+
+   SKIPs are final. The output ends with every question still open, as one
+   answers template keyed by job ID. Fill in each `answer` and `why` from the
+   post, as section 1, step 5, says, save the template as `answers.json`, and
+   run again with `--answers answers.json` added. A blank answer keeps its
+   post open. Take each READ post's verdict from that last run, never from
+   the row or the post alone. Each post's result is in
+   `results/<job id>.json`, for the bid log.
 4. Report BIDs first, then MAYBEs, each ranked by fewer proposals and then
    by newer, then one line per SKIP with the rules that skipped it. If
    nothing deserves a bid, say so plainly. That's a valid result.
@@ -125,7 +139,8 @@ by name in `submit`.
 ## 4. Log
 
 Only BID and MAYBE are logged; SKIPs stay in the report. Re-screening a post
-updates its row rather than adding a second.
+updates its row rather than adding a second. `screen.json` below is the
+post's result: in a scan, `results/<job id>.json`.
 
 For a Sheet (`log.type: sheet`, with `spreadsheet_id` and `tab`):
 

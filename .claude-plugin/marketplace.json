@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "upwork-skills",
+  "description": "Screening and safe submission for Upwork freelancers, built on the official Upwork connector.",
+  "owner": {
+    "name": "Mehboob Ali",
+    "url": "https://github.com/mehboobali98"
+  },
+  "plugins": [
+    {
+      "name": "upwork-skills",
+      "description": "Screens Upwork posts against your own rules before you spend Connects, submits a proposal only after you approve the exact preview, and logs every bid with the signals it was judged on.",
+      "source": "./",
+      "category": "productivity",
+      "keywords": ["upwork", "freelancing", "proposals", "connects"],
+      "license": "MIT"
+    }
+  ]
+}

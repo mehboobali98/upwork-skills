@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.5
+
+- `screen` keeps `preferred_locations` when it saves a post as `job.json`.
+  0.2.4 taught the rules to read it, but the skill's list of keys to keep
+  still dropped it, so a screen never reached the location rules. A test now
+  trims each saved post to the skill's list and checks the rules see the
+  same facts as with the full response.
+
 ## 0.2.4
 
 - **The location rules work.** `location-excluded` and

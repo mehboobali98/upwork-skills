@@ -2,6 +2,7 @@
 """Tests for facts.py. Run with: python3 test_facts.py"""
 import json
 import os
+import re
 import sys
 import unittest
 
@@ -188,6 +189,22 @@ class Lanes(unittest.TestCase):
         self.assertEqual((f["lane"], f["lane_skip_at_proposals"]), ("rails", 20))
         with self.assertRaises(ValueError):
             facts.build(row={"id": "1"}, settings=SETTINGS, now=NOW, lane="design")
+
+
+class ScreenSkill(unittest.TestCase):
+    def kept_keys(self):
+        path = os.path.join(os.path.dirname(FIXTURES), "..", "skills", "screen", "SKILL.md")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        listed = text.split("keeping only the keys the rules read:", 1)[1].split(", with", 1)[0]
+        return re.findall(r"`(\w+)`", listed)
+
+    def test_saved_job_keeps_every_key_the_rules_read(self):
+        for name in ("job-location.json", "job-coach.json", "job-full-time.json", "job-no-history.json"):
+            job = load(name)
+            kept = {k: v for k, v in job.items() if k in self.kept_keys()}
+            self.assertEqual(facts.build(job=kept, settings=SETTINGS, now=NOW),
+                             facts.build(job=job, settings=SETTINGS, now=NOW), name)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,200 @@
+rules:
+  - id: already-applied
+    kind: fixed
+    check: [applied, "==", true]
+    effect: SKIP
+    reason: "A proposal for this post already exists, and Upwork refuses a second one."
+
+  - id: post-closed
+    kind: fixed
+    check: [status, "!=", ACTIVE]
+    effect: SKIP
+    reason: "The post is no longer active."
+
+  - id: client-never-hired
+    kind: fixed
+    check:
+      any:
+        - [client_hires, "==", 0]
+        - [client_spend, "==", 0]
+    effect: SKIP
+    reason: "A client who has never hired or spent anything is unlikely to start with a freelancer who has no Upwork history."
+
+  - id: client-never-reviews
+    kind: fixed
+    check: [client_feedback_count, "==", 0]
+    effect: SKIP
+    reason: "A client who has never left feedback can't give the review that builds a Job Success Score."
+
+  - id: low-client-rating
+    kind: fixed
+    check:
+      all:
+        - [client_feedback_count, ">", 0]
+        - [client_score, "<", 4.8]
+    effect: SKIP
+    reason: "Freelancers who worked with this client rated it below 4.8."
+
+  - id: harsh-rater
+    kind: fixed
+    check: [client_gives_min, "<=", 3]
+    effect: SKIP
+    reason: "The client gave a recent freelancer 3 stars or fewer, and a harsh rater is the worst possible early review."
+
+  - id: low-hire-rate
+    kind: fixed
+    check:
+      all:
+        - [client_jobs_posted, ">=", 10]
+        - [client_hire_rate, "<", 30]
+    effect: SKIP
+    reason: "A client who posts often and rarely hires isn't working the post."
+    override:
+      check: [client_hires, ">=", 100]
+      reason: "A hundred or more hires means the client does hire, and the low rate comes from many small posts."
+
+  - id: already-moving
+    kind: fixed
+    check:
+      any:
+        - [hired, ">", 0]
+        - [offered, ">", 0]
+    effect: SKIP
+    reason: "The client has already hired someone or made an offer on this post."
+
+  - id: same-title-active
+    kind: fixed
+    check: [same_title_active, "==", true]
+    effect: SKIP
+    reason: "The client already has an open contract with this exact title, so the post is probably staffed."
+
+  - id: no-openings
+    kind: fixed
+    check: [persons_to_hire, "==", 0]
+    effect: SKIP
+    reason: "The post has no openings left to fill."
+
+  - id: dead-post
+    kind: fixed
+    check:
+      all:
+        - [age_hours, ">", 48]
+        - [invites, "==", 0]
+        - [interviews, "==", 0]
+    effect: SKIP
+    reason: "Two days with nobody invited or interviewed means the client isn't working the post."
+
+  - id: crowded
+    kind: fixed
+    check: [proposals, ">=", $lane_skip_at_proposals]
+    effect: SKIP
+    reason: "The post has reached the lane's proposal limit, and a proposal from someone with no reviews rarely gets read that far down."
+
+  - id: cannot-afford
+    kind: fixed
+    check: [connects_cost, ">", $connects_balance]
+    effect: SKIP
+    reason: "Applying costs more Connects than the balance."
+
+  - id: below-reserve
+    kind: fixed
+    check: [balance_after, "<", $min_balance]
+    effect: MAYBE
+    reason: "Applying leaves fewer Connects than the profile's reserve."
+
+  - id: rate-below-floor
+    kind: fixed
+    check:
+      all:
+        - [contract_type, "==", HOURLY]
+        - [hourly_max, "<", $rate_floor]
+    effect: SKIP
+    reason: "The client's top hourly rate is below the profile's floor."
+
+  - id: full-time
+    kind: fixed
+    check:
+      all:
+        - [full_time, "==", true]
+        - [available_hours, "<", 30]
+    effect: SKIP
+    reason: "The post wants 30 or more hours a week, more than the profile has available."
+
+  - id: unmet-qualifications
+    kind: fixed
+    check: [unmet_qualification_count, ">", 0]
+    effect: MAYBE
+    reason: "The client prefers qualifications the profile doesn't meet. Upwork still accepts the proposal, but boosting is unavailable and the client may filter it out."
+
+  - id: location-excluded
+    kind: fixed
+    check: [location_excluded, "==", true]
+    effect: SKIP
+    reason: "The post is restricted to locations that don't include the profile's country."
+
+  - id: location-preferred-elsewhere
+    kind: fixed
+    check: [location_preferred_elsewhere, "==", true]
+    effect: MAYBE
+    reason: "The client prefers other locations, though it doesn't require them."
+
+  - id: off-lane
+    kind: fixed
+    check: [lane, "==", other]
+    effect: MAYBE
+    reason: "The post matches none of the profile's lanes."
+
+  - id: coaching-ask
+    kind: judgement
+    ask: "Is the post mainly asking for coaching, tutoring or one-to-one teaching, rather than something built or delivered?"
+    answer: yes_no
+    fires_when: true
+    effect: SKIP
+    reason: "A vague teach-me ask turns into unpaid hand-holding."
+    override:
+      check:
+        all:
+          - [client_spend, ">=", 20000]
+          - [client_feedback_count, ">=", 20]
+      ask: "Does the post state paid hours, a duration and concrete deliverables?"
+      reason: "A defined, paid engagement, or a client with a long record of hiring and reviewing, is a real job rather than a vague ask."
+
+  - id: unbounded-scope
+    kind: judgement
+    ask: "How bounded is the deliverable, from 1 (open-ended, no clear finish) to 5 (one specific outcome that can be checked)?"
+    answer: score
+    fires_when: ["<=", 2]
+    effect: SKIP
+    reason: "Open-ended scope with a new client turns into unpaid work and a weak review."
+
+  - id: client-red-flags
+    kind: judgement
+    ask: "Does any review of this client from the last 12 months describe scope added after delivery, refund demands, non-payment or abuse?"
+    answer: yes_no
+    fires_when: true
+    effect: SKIP
+    reason: "Other freelancers have reported the problems that end in a bad review or no pay."
+
+  - id: outside-experience
+    kind: judgement
+    ask: "Does the core work need anything on the profile's lacks list?"
+    answer: yes_no
+    fires_when: true
+    effect: SKIP
+    reason: "A proposal can only promise work the freelancer can honestly claim."
+
+  - id: unrelated-client-history
+    kind: judgement
+    ask: "Is the client's contract history mostly in unrelated work, such as bookkeeping, design or writing?"
+    answer: yes_no
+    fires_when: true
+    effect: MAYBE
+    reason: "High spend in an unrelated category is a cold lead, not a warm one."
+
+  - id: unpaid-sample
+    kind: judgement
+    ask: "Does the post ask for unpaid sample work or a test task before hiring?"
+    answer: yes_no
+    fires_when: true
+    effect: NOTE
+    reason: "Before doing unpaid work, message the client to check the work is still wanted."

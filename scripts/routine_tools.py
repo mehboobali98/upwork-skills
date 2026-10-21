@@ -58,6 +58,8 @@ def deny_list(connection, local_names, allow):
     if not CONNECTION.match(connection):
         raise ToolsError(f"connection name {connection!r} may use only letters, digits, _ and -")
     tools = {server_tool(name) for name in local_names if name.strip()}
+    if not tools:
+        raise ToolsError(f"no tools listed for {connection}; an empty list would deny nothing")
     deny = sorted(f"mcp__{connection}__{t}" for t in tools if t.split("__")[-1] not in allow)
     seen = {t.split("__")[-1] for t in tools}
     return deny, [a for a in allow if a not in seen]

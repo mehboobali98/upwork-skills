@@ -21,7 +21,7 @@ If you can see any other Upwork or Google Sheets tool, don't use it, and name it
    ```
 
    Wherever a skill file says `${CLAUDE_PLUGIN_ROOT}`, use `/tmp/upwork-skills`.
-2. With the Write tool, write the lines between `-----BEGIN UPWORK PROFILE-----` and `-----END UPWORK PROFILE-----` at the end of this prompt to `~/.config/upwork-skills/profile.md`, exactly as they are, without the two marker lines.
+2. Run `echo $HOME` to get your home directory. With the Write tool, which needs that absolute path, write the lines between `-----BEGIN UPWORK PROFILE-----` and `-----END UPWORK PROFILE-----` at the end of this prompt to `$HOME/.config/upwork-skills/profile.md`, exactly as they are, without the two marker lines.
 3. Check it:
 
    ```sh

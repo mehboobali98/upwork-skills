@@ -105,6 +105,17 @@ class Main(unittest.TestCase):
         ])
         self.assertIn("get_profile is allowed but wasn't in the list", err.getvalue())
 
+    def test_an_empty_tool_list_is_refused(self):
+        with tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8") as fh:
+            fh.write("\n  \n")
+        self.addCleanup(os.remove, fh.name)
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = rt.main(["--connection", "Upwork", fh.name])
+        self.assertEqual(code, 2)
+        self.assertEqual(out.getvalue(), "")
+        self.assertIn("no tools listed", err.getvalue())
+
     def test_unknown_connection(self):
         err = io.StringIO()
         with contextlib.redirect_stderr(err):

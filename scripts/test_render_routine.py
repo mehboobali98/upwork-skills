@@ -126,6 +126,10 @@ class Render(unittest.TestCase):
         prompt = rr.render("{{profile}}", "note: {{tag}}\n", REL, "0 9 * * *", ALLOWED)
         self.assertIn("note: {{tag}}", prompt)
 
+    def test_setup_resolves_the_home_directory(self):
+        self.assertIn("echo $HOME", self.prompt)
+        self.assertIn("$HOME/.config/upwork-skills/profile.md", self.prompt)
+
     def test_windows_drafting_and_tools(self):
         self.assertIn("- 09:00: posts since 22:00 the day before", self.prompt)
         self.assertIn(rr.DRAFT_PREFACE, self.prompt)

@@ -93,6 +93,9 @@ one per line, in `<name>-tools.txt` (names like
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/routine_tools.py" --connection <name> <name>-tools.txt
 ```
 
+If you can't see a kept connector's tools in this session, stop and say so:
+an empty list would deny nothing, and the script refuses one.
+
 `<name>` is the connection's `name` on the routine, such as `Upwork` or
 `Google_Sheets`; the cloud names a tool `mcp__<name>__<tool>`. The script
 prints the tools to deny. The new `disallowed_tools` is both lists together,

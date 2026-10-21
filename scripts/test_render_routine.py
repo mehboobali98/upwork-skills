@@ -133,6 +133,11 @@ class Render(unittest.TestCase):
         self.assertIn("Don't start subagents, forks or background tasks", self.prompt)
         self.assertIn("don't end your turn until the report is written", self.prompt)
 
+    def test_each_read_post_runs_the_job_rules(self):
+        self.assertIn("python3 /tmp/upwork-skills/scripts/fixed_rules.py --job job.json --row row.json --json", self.prompt)
+        self.assertIn("--answers answers.json", self.prompt)
+        self.assertIn("never from the row or the post alone", self.prompt)
+
     def test_setup_resolves_the_home_directory(self):
         self.assertIn("echo $HOME", self.prompt)
         self.assertIn("$HOME/.config/upwork-skills/profile.md", self.prompt)

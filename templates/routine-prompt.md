@@ -42,6 +42,14 @@ Times are UTC. Find when this run fired: the "This task fired at" line added to 
 
 Read `/tmp/upwork-skills/skills/screen/SKILL.md` and follow its section 2, "A scan", for this window, including the bid log in its section 4. Leave out its offer to draft; drafting is the next step here. If the profile's log is a CSV, the file won't outlive this run, so put each row in the report instead.
 
+The first pass only runs the rules a search row can answer and asks none of the judgement questions, so a READ row isn't a verdict yet. Screen every READ post as its section 1, steps 2 to 5, says, in a directory of its own named by the job ID: save its `find_jobs action=get` response as `job.json` and its row as `row.json`, then run
+
+```sh
+python3 /tmp/upwork-skills/scripts/fixed_rules.py --job job.json --row row.json --json
+```
+
+Unless that says SKIP, answer each question in its `pending` list in `answers.json` and run it again with `--answers answers.json` added. Take each READ post's verdict from that last output, never from the row or the post alone.
+
 ## 4. Draft
 
 {{drafting}}

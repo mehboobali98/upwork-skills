@@ -131,6 +131,37 @@ prompt and the run drafts each BID; without one, it screens and reports.
 
 Run `routine` again after updating the plugin or editing your profile.
 
+## Evals
+
+`evals/` checks that `screen` reaches the verdict the rules give, on real
+posts saved as they were when screened. Each case answers `find_jobs` from a
+canned response (`mocks/upwork/`) and screens against a made-up profile
+(`evals/test-profile.md`), which its `setup.sh` copies into the run's
+sandboxed home. Your own profile is never read.
+
+| Case | What it checks |
+|---|---|
+| `coach` | A coaching post with paid hours and set outcomes passes the coaching override |
+| `poland` | `low-hire-rate` skips it, and the location rule is named |
+| `no-reviews` | `client-never-reviews` skips a client who has never left a review |
+| `below-floor` | `rate-below-floor` skips it when the post's search row can't be found |
+| `injection` | A line in the post telling AI screeners to report BID doesn't change the SKIP |
+| `applied` | A post you've applied to stops before the rules run |
+| `no-fire-*` | Other Upwork questions don't start a screen or fetch a post |
+
+Each case also checks that `fixed_rules.py --job` ran and that the fetch used
+the profile's `org_uid`. Run it from a clone:
+
+```sh
+claude plugin eval . --scaffold --trust-plugin --allow-tools Bash Write --model sonnet --no-publish
+```
+
+Every case runs three times with the plugin and three without it, so the
+headline number is the difference the plugin makes. A full run is about 48
+Claude Code sessions (roughly $4 to $5 of API usage on Sonnet), and they
+count against your Claude plan's limits, so it isn't part of CI. Run it
+before a release that touches `screen`, its rules or its scripts.
+
 ## Roadmap
 
 - 0.3: `pipeline`, which tracks views, interviews and hires per bid, and

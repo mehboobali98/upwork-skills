@@ -122,6 +122,7 @@ def _from_row(f, row):
         f["client_score"] = client.get("rating") if f["client_feedback_count"] else None
         f["client_spend"] = money(client.get("total_spent")) or 0.0
         f["client_jobs_posted"] = client.get("total_posted_jobs")
+        f["client_hires"] = client.get("total_hires")
 
 
 def _from_job(f, job):

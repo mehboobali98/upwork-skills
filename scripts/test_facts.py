@@ -122,6 +122,11 @@ class FromRow(unittest.TestCase):
         self.assertFalse(f["applied"])
         self.assertEqual(f["lane"], "rails")
 
+    def test_recommended_feed_rows_carry_hires(self):
+        f = facts.build(row={"id": "1", "client": {"total_hires": 3, "total_reviews": 1}}, now=NOW)
+        self.assertEqual(f["client_hires"], 3)
+        self.assertIsNone(facts.build(row={"id": "1", "client": {"total_reviews": 1}}, now=NOW)["client_hires"])
+
     def test_dashboard_engagement_wording(self):
         self.assertTrue(facts.build(row={"id": "1", "engagement": "30+ hrs/week"}, now=NOW)["full_time"])
         self.assertFalse(facts.build(row={"id": "1", "engagement": "Less than 30 hrs/week"}, now=NOW)["full_time"])

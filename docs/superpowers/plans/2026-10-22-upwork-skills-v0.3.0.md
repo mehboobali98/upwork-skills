@@ -1142,7 +1142,7 @@ If nothing changed and nothing is unread, say so in one line.
 Run: `grep -o 'outcomes.py" [a-z]*' skills/pipeline/SKILL.md | sort -u && python3 scripts/outcomes.py decide --help | grep -E -- '--(proposals|jobs|listed|at|apply)'`
 Expected: `outcomes.py" decide` and `outcomes.py" todo`, then all five options listed.
 
-Run: `grep -c '—' skills/pipeline/SKILL.md`
+Run: `grep -c "$(printf '\342\200\224')" skills/pipeline/SKILL.md`
 Expected: `0`.
 
 - [ ] **Step 3: Commit.**
@@ -1457,7 +1457,7 @@ for py in python3 /usr/bin/python3; do for t in scripts/test_*.py; do $py "$t" 2
 python3 scripts/profile_loader.py --profile templates/profile.example.md --check
 python3 scripts/render_routine.py --cron "0 9,14,18,22 * * *" --profile templates/profile.example.md > /dev/null && echo render ok
 for j in .claude-plugin/*.json; do python3 -m json.tool "$j" > /dev/null && echo "$j ok"; done
-grep -rn '—' README.md CHANGELOG.md skills templates scripts docs/superpowers/specs/2026-10-22-upwork-skills-v0.3-pipeline-design.md || echo "no em dashes"
+grep -rn "$(printf '\342\200\224')" README.md CHANGELOG.md skills templates scripts docs/superpowers/specs/2026-10-22-upwork-skills-v0.3-pipeline-design.md || echo "no em dashes"
 ```
 
 Expected: twenty `OK` lines, `profile OK`, `render ok`, both manifests ok, `no em dashes`.

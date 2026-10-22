@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1
+
+- The scheduled scan tells the run to skip any step of your drafting
+  instructions that saves a file. The first 0.3.0 run put its draft in the
+  report as asked, and also saved it in the cloud sandbox, because the
+  drafting instructions said to save one. Run `/upwork-skills:routine` again
+  after updating.
+- `bidlog.now()` is public; `outcomes.py` was calling a private helper.
+
 ## 0.3.0
 
 - New skill, `pipeline`. `scripts/outcomes.py` tracks each logged bid to

@@ -118,7 +118,7 @@ def _pair(text):
     return name, value
 
 
-def _now():
+def now():
     return datetime.now().astimezone().isoformat(timespec="minutes")
 
 
@@ -144,7 +144,7 @@ def main(argv=None):
             update_csv(os.path.expanduser(args.csv), args.job_id, changes)
             return 0
         with open(args.result, encoding="utf-8") as fh:
-            row = row_from_result(json.load(fh), args.at or _now())
+            row = row_from_result(json.load(fh), args.at or now())
         if args.cmd == "upsert":
             upsert_csv(os.path.expanduser(args.csv), row)
             return 0

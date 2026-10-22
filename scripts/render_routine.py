@@ -31,7 +31,8 @@ DRAFT_PREFACE = (
     "there is no evidence file and there are no past letters: use the "
     "profile's allowed claims, which carry their evidence IDs. Run "
     "`check_letter.py` from `/tmp/upwork-skills/scripts`. Put each draft in "
-    "the report under its post instead of saving a file."
+    "the report under its post, and skip any step of those instructions that "
+    "saves a file: nothing saved in this run outlives it."
 )
 NO_DRAFT = "Don't draft. Say each BID is ready for a proposal."
 SLOT = re.compile(r"\{\{(\w+)\}\}")

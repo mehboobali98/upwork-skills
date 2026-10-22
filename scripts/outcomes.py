@@ -164,7 +164,7 @@ def unlogged(rows, listed):
 
 
 def decide(rows, proposals, jobs, listed=(), at=None):
-    at = at or bidlog._now()
+    at = at or bidlog.now()
     first, last = bidlog.RANGES["pipeline"].split(":")
     out = {"changes": [], "errors": [], "unlogged": unlogged(rows, listed), "unchanged": 0}
     for n, row in tracked(rows):
